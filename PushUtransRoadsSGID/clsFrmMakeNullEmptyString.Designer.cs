@@ -32,16 +32,19 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.cboChooseFields = new System.Windows.Forms.ComboBox();
-            this.btnSelectBlankNulls = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
+            this.btnSelectBlankNulls = new System.Windows.Forms.Button();
+            this.cboChooseFields = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.cboChooseFieldToUpdate = new System.Windows.Forms.ComboBox();
             this.btnUpdateFieldValuesEmptyString = new System.Windows.Forms.Button();
+            this.cboChooseFieldToUpdate = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.cboChooseLayer = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -77,61 +80,12 @@
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.btnSelectBlankNulls);
             this.groupBox1.Controls.Add(this.cboChooseFields);
-            this.groupBox1.Location = new System.Drawing.Point(12, 113);
+            this.groupBox1.Location = new System.Drawing.Point(12, 187);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(527, 106);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Select Features that have Blanks or Nulls";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 57);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(220, 13);
-            this.label5.TabIndex = 5;
-            this.label5.Text = "The tool will honor the layer\'s definition query.";
-            // 
-            // cboChooseFields
-            // 
-            this.cboChooseFields.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboChooseFields.FormattingEnabled = true;
-            this.cboChooseFields.Items.AddRange(new object[] {
-            "ADDR_SYS",
-            "CARTOCODE",
-            "FULLNAME",
-            "PREDIR",
-            "STREETNAME",
-            "STREETTYPE",
-            "SUFDIR",
-            "ALIAS1",
-            "ALIAS1TYPE",
-            "ALIAS2",
-            "ALIAS2TYPE",
-            "ACSALIAS",
-            "ACSNAME",
-            "ACSSUF",
-            "USPS_PLACE",
-            "CLASS",
-            "VERTLEVEL",
-            "HWYNAME",
-            "DOT_RTNAME",
-            "DOT_RTPART"});
-            this.cboChooseFields.Location = new System.Drawing.Point(23, 52);
-            this.cboChooseFields.MaxDropDownItems = 25;
-            this.cboChooseFields.Name = "cboChooseFields";
-            this.cboChooseFields.Size = new System.Drawing.Size(240, 21);
-            this.cboChooseFields.TabIndex = 0;
-            // 
-            // btnSelectBlankNulls
-            // 
-            this.btnSelectBlankNulls.Location = new System.Drawing.Point(307, 52);
-            this.btnSelectBlankNulls.Name = "btnSelectBlankNulls";
-            this.btnSelectBlankNulls.Size = new System.Drawing.Size(148, 23);
-            this.btnSelectBlankNulls.TabIndex = 1;
-            this.btnSelectBlankNulls.Text = "Select Blank or Nulls";
-            this.btnSelectBlankNulls.UseVisualStyleBackColor = true;
             // 
             // label6
             // 
@@ -142,26 +96,55 @@
             this.label6.TabIndex = 2;
             this.label6.Text = "Choose Field to Check";
             // 
+            // btnSelectBlankNulls
+            // 
+            this.btnSelectBlankNulls.Location = new System.Drawing.Point(307, 52);
+            this.btnSelectBlankNulls.Name = "btnSelectBlankNulls";
+            this.btnSelectBlankNulls.Size = new System.Drawing.Size(148, 23);
+            this.btnSelectBlankNulls.TabIndex = 1;
+            this.btnSelectBlankNulls.Text = "Select Blank or Nulls";
+            this.btnSelectBlankNulls.UseVisualStyleBackColor = true;
+            this.btnSelectBlankNulls.Click += new System.EventHandler(this.btnSelectBlankNulls_Click);
+            // 
+            // cboChooseFields
+            // 
+            this.cboChooseFields.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboChooseFields.FormattingEnabled = true;
+            this.cboChooseFields.Location = new System.Drawing.Point(23, 52);
+            this.cboChooseFields.MaxDropDownItems = 25;
+            this.cboChooseFields.Name = "cboChooseFields";
+            this.cboChooseFields.Size = new System.Drawing.Size(240, 21);
+            this.cboChooseFields.TabIndex = 0;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(13, 57);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(220, 13);
+            this.label5.TabIndex = 5;
+            this.label5.Text = "The tool will honor the layer\'s definition query.";
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.btnUpdateFieldValuesEmptyString);
             this.groupBox2.Controls.Add(this.cboChooseFieldToUpdate);
             this.groupBox2.Controls.Add(this.label7);
-            this.groupBox2.Location = new System.Drawing.Point(12, 235);
+            this.groupBox2.Location = new System.Drawing.Point(12, 308);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(527, 100);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Convert the Selected Features\' Blanks and Nulls to Empty String";
             // 
-            // label7
+            // btnUpdateFieldValuesEmptyString
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(23, 40);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(153, 13);
-            this.label7.TabIndex = 0;
-            this.label7.Text = "Choose Field to Update Values";
+            this.btnUpdateFieldValuesEmptyString.Location = new System.Drawing.Point(307, 54);
+            this.btnUpdateFieldValuesEmptyString.Name = "btnUpdateFieldValuesEmptyString";
+            this.btnUpdateFieldValuesEmptyString.Size = new System.Drawing.Size(148, 23);
+            this.btnUpdateFieldValuesEmptyString.TabIndex = 2;
+            this.btnUpdateFieldValuesEmptyString.Text = "Update Selected Fields";
+            this.btnUpdateFieldValuesEmptyString.UseVisualStyleBackColor = true;
             // 
             // cboChooseFieldToUpdate
             // 
@@ -194,20 +177,41 @@
             this.cboChooseFieldToUpdate.Size = new System.Drawing.Size(240, 21);
             this.cboChooseFieldToUpdate.TabIndex = 1;
             // 
-            // btnUpdateFieldValuesEmptyString
+            // label7
             // 
-            this.btnUpdateFieldValuesEmptyString.Location = new System.Drawing.Point(307, 54);
-            this.btnUpdateFieldValuesEmptyString.Name = "btnUpdateFieldValuesEmptyString";
-            this.btnUpdateFieldValuesEmptyString.Size = new System.Drawing.Size(148, 23);
-            this.btnUpdateFieldValuesEmptyString.TabIndex = 2;
-            this.btnUpdateFieldValuesEmptyString.Text = "Update Selected Fields";
-            this.btnUpdateFieldValuesEmptyString.UseVisualStyleBackColor = true;
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(23, 40);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(153, 13);
+            this.label7.TabIndex = 0;
+            this.label7.Text = "Choose Field to Update Values";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.cboChooseLayer);
+            this.groupBox3.Location = new System.Drawing.Point(12, 101);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(527, 68);
+            this.groupBox3.TabIndex = 7;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Choose GIS layer to work with";
+            // 
+            // cboChooseLayer
+            // 
+            this.cboChooseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboChooseLayer.FormattingEnabled = true;
+            this.cboChooseLayer.Location = new System.Drawing.Point(23, 20);
+            this.cboChooseLayer.Name = "cboChooseLayer";
+            this.cboChooseLayer.Size = new System.Drawing.Size(281, 21);
+            this.cboChooseLayer.TabIndex = 0;
+            this.cboChooseLayer.SelectedIndexChanged += new System.EventHandler(this.cboChooseLayer_SelectedIndexChanged);
             // 
             // clsFrmMakeNullEmptyString
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(572, 366);
+            this.ClientSize = new System.Drawing.Size(572, 448);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.groupBox1);
@@ -218,10 +222,12 @@
             this.Name = "clsFrmMakeNullEmptyString";
             this.ShowIcon = false;
             this.Text = "Convert Nulls/Blanks to Empty String";
+            this.Load += new System.EventHandler(this.clsFrmMakeNullEmptyString_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -241,5 +247,7 @@
         private System.Windows.Forms.Button btnUpdateFieldValuesEmptyString;
         private System.Windows.Forms.ComboBox cboChooseFieldToUpdate;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.ComboBox cboChooseLayer;
     }
 }

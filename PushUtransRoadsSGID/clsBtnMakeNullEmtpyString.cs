@@ -66,7 +66,7 @@ namespace PushUtransRoadsSGID
         #endregion
         #endregion
 
-        private IApplication m_application;
+        //private IApplication m_application;
         public clsBtnMakeNullEmtpyString()
         {
             //
@@ -77,19 +77,7 @@ namespace PushUtransRoadsSGID
             base.m_message = "This tool checks for blank-and-null values in the dataset and converts them to empty string.";  //localizable text 
             base.m_toolTip = "Check for blanks and nulls";  //localizable text 
             base.m_name = "CheckForBlanksNulls";   //unique id, non-localizable (e.g. "MyCategory_ArcMapCommand")
-
-            try
-            {
-                //
-                // TODO: change bitmap name if necessary
-                //
-                string bitmapResourceName = GetType().Name + ".bmp";
-                base.m_bitmap = new Bitmap(GetType(), bitmapResourceName);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Trace.WriteLine(ex.Message, "Invalid Bitmap");
-            }
+            base.m_bitmap = Properties.Resources.TableFields16;
         }
 
         #region Overridden Class Methods
@@ -103,7 +91,7 @@ namespace PushUtransRoadsSGID
             if (hook == null)
                 return;
 
-            m_application = hook as IApplication;
+            clsGlobals.arcApplication = hook as IApplication;
 
             //Disable if it is not ArcMap
             if (hook is IMxApplication)
@@ -121,7 +109,7 @@ namespace PushUtransRoadsSGID
         {
             // TODO: Add clsBtnMakeNullEmtpyString.OnClick implementation
             clsFrmMakeNullEmptyString convertToEmtpyString = new clsFrmMakeNullEmptyString();
-            convertToEmtpyString.Show(new clsModelessDialog(m_application.hWnd));
+            convertToEmtpyString.Show(new clsModelessDialog(clsGlobals.arcApplication.hWnd));
         }
 
         #endregion
