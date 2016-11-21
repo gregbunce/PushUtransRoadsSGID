@@ -41,6 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,6 +51,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ESRI.ArcGIS.ADF.Local, Version=10.4.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
@@ -74,6 +76,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -81,8 +84,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="clsBtnMakeNullEmtpyString.cs" />
     <Compile Include="clsBtnUtransRoadsSGID.cs" />
+    <Compile Include="clsFrmMakeNullEmptyString.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clsFrmMakeNullEmptyString.Designer.cs">
+      <DependentUpon>clsFrmMakeNullEmptyString.cs</DependentUpon>
+    </Compile>
+    <Compile Include="clsModelessDialog.cs" />
     <Compile Include="clsTlbrUtransRoadsSGID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -100,6 +110,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="clsBtnUtransRoadsSGID.bmp" />
+    <EmbeddedResource Include="clsFrmMakeNullEmptyString.resx">
+      <DependentUpon>clsFrmMakeNullEmptyString.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="clsBtnMakeNullEmtpyString.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
