@@ -50,6 +50,18 @@ namespace PushUtransRoadsSGID
             set;
         }
 
+        public static IGeoFeatureLayer pGFlayer
+        {
+            get;
+            set;
+        }
+
+        public static IFeatureLayer arcFeatLayer
+        {
+            get;
+            set;
+        }
+
 
     }
 }

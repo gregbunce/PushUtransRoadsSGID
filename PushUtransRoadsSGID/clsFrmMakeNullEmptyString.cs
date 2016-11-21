@@ -1,6 +1,8 @@
 ﻿using ESRI.ArcGIS.ArcMapUI;
 using ESRI.ArcGIS.Carto;
+using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geometry;
+using ESRI.ArcGIS.SystemUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,10 +39,49 @@ namespace PushUtransRoadsSGID
                 System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
 
+                ITable arcTable = (ITable)clsGlobals.arcFeatLayer;
+
+
+
                 // select the records that have nulls or blanks
+                IQueryFilter arcQueryFilter = new QueryFilter();
+                arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
 
-    
+                IDataset arcDataset = (IDataset)clsGlobals.arcFeatLayer;
+                ISelectionSet arcSelSet = arcTable.Select(arcQueryFilter,esriSelectionType.esriSelectionTypeHybrid, esriSelectionOption.esriSelectionOptionNormal, arcDataset.Workspace);
 
+
+                ISelectFeaturesOperation arcSeleFeatOperation;
+                arcSeleFeatOperation = new SelectFeaturesOperationClass();
+                arcSeleFeatOperation.ActiveView = clsGlobals.pActiveView;
+                arcSeleFeatOperation.Layer = clsGlobals.arcFeatLayer;
+                arcSeleFeatOperation.SelectionSet = arcSelSet;
+
+                //perform the operation
+                clsGlobals.pMxDocument.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGeoSelection, null, null);
+
+                IOperationStack arcOperationStack = clsGlobals.pMxDocument.OperationStack;
+                arcOperationStack.Do((IOperation)arcSeleFeatOperation);
+
+                clsGlobals.pMxDocument.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGeoSelection, null, null);
+
+
+                ////IFeatureLayer arcFeatLayer = clsGlobals.pGFlayer;
+                //IFeatureLayerDefinition arcFeatureLayerDef = (IFeatureLayerDefinition)clsGlobals.pGFlayer;
+                //string strExistingDefQuery = arcFeatureLayerDef.DefinitionExpression; 
+
+
+                //// select the records that have nulls or blanks
+                //IQueryFilter arcQueryFilter = new QueryFilter();
+                //arcQueryFilter.WhereClause = "(" + strExistingDefQuery + ") AND " + cboChooseFields.Text.ToString().Trim() + " is null";
+
+
+
+
+                //IDataset arcDataset = (IDataset)clsGlobals.pGFlayer.FeatureClass;
+                //ISelectionSet arcSelSet = clsGlobals.pGFlayer.FeatureClass.Select(arcQueryFilter,esriSelectionType.esriSelectionTypeHybrid, esriSelectionOption.esriSelectionOptionNormal, arcDataset.Workspace);
+
+                //clsGlobals.pActiveView.Refresh();
 
 
 
@@ -100,10 +141,6 @@ namespace PushUtransRoadsSGID
                 // show the cursor as busy
                 System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
-                // clear out the old items in the list
-                cboChooseLayer.Items.Clear();
-                cboChooseFieldToUpdate.Items.Clear();
-
                 //make sure the user has selected a polyline layer
                 //if (clsGlobals.pMxDocument.SelectedLayer == null)
                 //{
@@ -131,23 +168,27 @@ namespace PushUtransRoadsSGID
                 //    return;
                 //}
 
-                IGeoFeatureLayer pGFlayer = null;
+                clsGlobals.pGFlayer = null;
 
                 // loop through the map's layers and check for the layer with the targeted name (based on the choose layer combobox)
                 for (int i = 0; i < clsGlobals.pMap.LayerCount; i++)
                 {
                     if (clsGlobals.pMap.Layer[i].Name == cboChooseLayer.Text)
                     {
-                        pGFlayer = (IGeoFeatureLayer)clsGlobals.pMap.Layer[i];
+                        clsGlobals.pGFlayer = (IGeoFeatureLayer)clsGlobals.pMap.Layer[i];
+                        clsGlobals.arcFeatLayer = (IFeatureLayer)clsGlobals.pMap.Layer[i];
                     }
                 }
 
+                // clear out the old items in the list
+                cboChooseFieldToUpdate.Items.Clear();
+                cboChooseFields.Items.Clear();
 
                 //update the comboboxes with the currently selected layer's field names
-                for (int i = 0; i < pGFlayer.FeatureClass.Fields.FieldCount; i++)
+                for (int i = 0; i < clsGlobals.pGFlayer.FeatureClass.Fields.FieldCount; i++)
                 {
-                    cboChooseFields.Items.Add(pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboChooseFieldToUpdate.Items.Add(pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboChooseFields.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboChooseFieldToUpdate.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                 }
             }
             catch (Exception ex)
