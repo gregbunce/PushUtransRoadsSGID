@@ -1,4 +1,5 @@
 ﻿using ESRI.ArcGIS.ArcMapUI;
+using ESRI.ArcGIS.Geodatabase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,28 @@ namespace PushUtransRoadsSGID
             }
 
         } 
+
+
+        public static esriFieldType GetArcGisFieldType(string strFieldName)
+        {
+            try
+            {
+                IFields fields = clsGlobals.arcFeatLayer.FeatureClass.Fields;
+                IField field = fields.get_Field(clsGlobals.arcFeatLayer.FeatureClass.Fields.FindField(strFieldName));
+
+                return field.Type;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error Message: " + Environment.NewLine + ex.Message + Environment.NewLine + Environment.NewLine +
+                "Error Source: " + Environment.NewLine + ex.Source + Environment.NewLine + Environment.NewLine +
+                "Error Location:" + Environment.NewLine + ex.StackTrace,
+                "Push Utrans Roads to SGID!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+                return 0;
+            }
+
+        }
 
 
 

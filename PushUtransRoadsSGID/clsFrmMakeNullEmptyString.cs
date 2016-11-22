@@ -47,7 +47,7 @@ namespace PushUtransRoadsSGID
                 IQueryFilter arcQueryFilter = new QueryFilter();
                 arcQueryFilter.WhereClause = null;
 
-                // check what type of layer this is, to base the query syntax on
+                // check what type of layer this is, to determine the query syntax
                 //shapefile//
                 if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriFileSystemWorkspace)
                 {
@@ -56,7 +56,30 @@ namespace PushUtransRoadsSGID
                 //fgdb//
                 if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriLocalDatabaseWorkspace)
                 {
-                    arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or " + cboChooseFields.Text.ToString().Trim() + " = ''";
+                    //check the field type, look for either text or double/integer to determine what type of query to set up
+                    if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeString)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or " + cboChooseFields.Text.ToString().Trim() + " = ''";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeDouble)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeInteger)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeSmallInteger)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                    }
+                    else
+                    {
+                        MessageBox.Show("You're asking to do a query on a field type that is not supported by this code.  If you need this field type to be supported talk to Greg Bunce.  He will make it happen.", "Not Supported Field Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+
+
                 }
                 //sde//
                 if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriRemoteDatabaseWorkspace)
