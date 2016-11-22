@@ -135,7 +135,8 @@
             this.groupBox2.Size = new System.Drawing.Size(527, 100);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Convert the Selected Features\' Blanks and Nulls to Empty String";
+            this.groupBox2.Text = "Convert the Selected Features\' Blanks and Nulls to Empty String (or Zero if integ" +
+    "er field)";
             // 
             // btnUpdateFieldValuesEmptyString
             // 

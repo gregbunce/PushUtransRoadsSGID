@@ -51,7 +51,28 @@ namespace PushUtransRoadsSGID
                 //shapefile//
                 if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriFileSystemWorkspace)
                 {
-                    arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null or \"" + cboChooseFields.Text.ToString().Trim() + "\" = ''";
+                    //check the field type, look for either text or double/integer to determine what type of query to set up
+                    if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeString)
+                    {
+                        arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null or \"" + cboChooseFields.Text.ToString().Trim() + "\" = ''";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeDouble)
+                    {
+                        arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeInteger)
+                    {
+                        arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeSmallInteger)
+                    {
+                        arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null";
+                    }
+                    else
+                    {
+                        MessageBox.Show("You're asking to do a query on a field type that is not supported by this code.  If you need this field type to be supported talk to Greg Bunce.  He will make it happen.", "Not Supported Field Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
                 }
                 //fgdb//
                 if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriLocalDatabaseWorkspace)
@@ -78,15 +99,34 @@ namespace PushUtransRoadsSGID
                         MessageBox.Show("You're asking to do a query on a field type that is not supported by this code.  If you need this field type to be supported talk to Greg Bunce.  He will make it happen.", "Not Supported Field Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
-
-
                 }
                 //sde//
                 if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriRemoteDatabaseWorkspace)
                 {
-                    arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
+                    //check the field type, look for either text or double/integer to determine what type of query to set up
+                    if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeString)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeDouble)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeInteger)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                    }
+                    else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeSmallInteger)
+                    {
+                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                    }
+                    else
+                    {
+                        MessageBox.Show("You're asking to do a query on a field type that is currently not supported by this code.  If you need this field type to be supported talk to Greg Bunce.  He will make it happen.", "Not Supported Field Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
                 }
-
+        
                 // select the records that have nulls or blanks
                 ISelectionSet arcSelSet = arcTable.Select(arcQueryFilter,esriSelectionType.esriSelectionTypeHybrid, esriSelectionOption.esriSelectionOptionNormal, arcDataset.Workspace);
 
@@ -290,35 +330,56 @@ namespace PushUtransRoadsSGID
 
 
                 // confirm the user wants to edit that layer's fields on the selected records
-                DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, converting the vaules in the " + cboChooseFieldToUpdate.Text + " Field to empty string?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, converting the vaules in the " + cboChooseFieldToUpdate.Text + " Field to empty string (or Zero if the field type is double or int)?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
+
                     // set some variables for editing the selected features
                     IFeature arcFeatureToEdit = null;
                     IEnumIDs arcEnumIDs = arcSelectionSet.IDs;
                     int iD;
 
-                    // loop through the selected feature in the user specified layer and make the values in the user specified field empty string
-                    while ((iD = arcEnumIDs.Next()) != -1)
+                    // check what field type the field is ... to either set values to empty string or zero (if int)
+                    esriFieldType updateFieldType = clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFieldToUpdate.Text);
+
+                    if (updateFieldType == esriFieldType.esriFieldTypeString)
                     {
-                        arcFeatureToEdit = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
-                        clsGlobals.arcEditor.StartOperation();
+                        // loop through the selected feature in the user specified layer and make the values in the user specified field empty string
+                        while ((iD = arcEnumIDs.Next()) != -1)
+                        {
+                            arcFeatureToEdit = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
+                            clsGlobals.arcEditor.StartOperation();
 
-                        arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboChooseFieldToUpdate.Text), "");
+                            arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboChooseFieldToUpdate.Text), "");
 
-                        arcFeatureToEdit.Store();
-                        clsGlobals.arcEditor.StopOperation(cboChooseFieldToUpdate.Text.ToString() + " to empty string");
+                            arcFeatureToEdit.Store();
+                            clsGlobals.arcEditor.StopOperation(cboChooseFieldToUpdate.Text.ToString() + " to empty string");
+                        }
+                    }
+                    else if (updateFieldType == esriFieldType.esriFieldTypeDouble | updateFieldType == esriFieldType.esriFieldTypeInteger | updateFieldType == esriFieldType.esriFieldTypeSmallInteger)
+                    {
+                        // loop through the selected feature in the user specified layer and make the values in the user specified field empty string
+                        while ((iD = arcEnumIDs.Next()) != -1)
+                        {
+                            arcFeatureToEdit = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
+                            clsGlobals.arcEditor.StartOperation();
+
+                            arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboChooseFieldToUpdate.Text), 0);
+
+                            arcFeatureToEdit.Store();
+                            clsGlobals.arcEditor.StopOperation(cboChooseFieldToUpdate.Text.ToString() + " to zero");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("You're asking to do an update on a field type that is currently not supported by this code.  If you need this field type to be supported talk to Greg Bunce.  He will make it happen.", "Not Supported Field Type", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
                     }
                 }
                 else if (dialogResult == DialogResult.No)
                 {
                     return;
                 }
-
-
-
-
-
 
             }
             catch (Exception ex)
