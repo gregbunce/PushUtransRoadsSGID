@@ -145,6 +145,7 @@
             this.btnUpdateFieldValuesEmptyString.TabIndex = 2;
             this.btnUpdateFieldValuesEmptyString.Text = "Update Selected Fields";
             this.btnUpdateFieldValuesEmptyString.UseVisualStyleBackColor = true;
+            this.btnUpdateFieldValuesEmptyString.Click += new System.EventHandler(this.btnUpdateFieldValuesEmptyString_Click);
             // 
             // cboChooseFieldToUpdate
             // 

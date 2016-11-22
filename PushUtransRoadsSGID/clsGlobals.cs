@@ -1,5 +1,6 @@
 ﻿using ESRI.ArcGIS.ArcMapUI;
 using ESRI.ArcGIS.Carto;
+using ESRI.ArcGIS.Editor;
 using ESRI.ArcGIS.Framework;
 using ESRI.ArcGIS.Geodatabase;
 using System;
@@ -57,6 +58,12 @@ namespace PushUtransRoadsSGID
         }
 
         public static IFeatureLayer arcFeatLayer
+        {
+            get;
+            set;
+        }
+
+        public static IEditor3 arcEditor
         {
             get;
             set;

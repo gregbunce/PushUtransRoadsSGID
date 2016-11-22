@@ -1,5 +1,7 @@
 ﻿using ESRI.ArcGIS.ArcMapUI;
 using ESRI.ArcGIS.Carto;
+using ESRI.ArcGIS.Editor;
+using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geometry;
 using ESRI.ArcGIS.SystemUI;
@@ -38,18 +40,32 @@ namespace PushUtransRoadsSGID
                 //show the cursor as busy
                 System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
-
+                // cast the layer to itable interface b/c it makes use of the layer's definition query or join, if any.. and does the select based on that
                 ITable arcTable = (ITable)clsGlobals.arcFeatLayer;
 
+                IDataset arcDataset = (IDataset)clsGlobals.arcFeatLayer;
+                IQueryFilter arcQueryFilter = new QueryFilter();
+                arcQueryFilter.WhereClause = null;
 
+                // check what type of layer this is, to base the query syntax on
+                //shapefile//
+                if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriFileSystemWorkspace)
+                {
+                    arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null or \"" + cboChooseFields.Text.ToString().Trim() + "\" = ''";
+                }
+                //fgdb//
+                if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriLocalDatabaseWorkspace)
+                {
+                    arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or " + cboChooseFields.Text.ToString().Trim() + " = ''";
+                }
+                //sde//
+                if (arcDataset.Workspace.WorkspaceFactory.WorkspaceType == esriWorkspaceType.esriRemoteDatabaseWorkspace)
+                {
+                    arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
+                }
 
                 // select the records that have nulls or blanks
-                IQueryFilter arcQueryFilter = new QueryFilter();
-                arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
-
-                IDataset arcDataset = (IDataset)clsGlobals.arcFeatLayer;
                 ISelectionSet arcSelSet = arcTable.Select(arcQueryFilter,esriSelectionType.esriSelectionTypeHybrid, esriSelectionOption.esriSelectionOptionNormal, arcDataset.Workspace);
-
 
                 ISelectFeaturesOperation arcSeleFeatOperation;
                 arcSeleFeatOperation = new SelectFeaturesOperationClass();
@@ -65,26 +81,18 @@ namespace PushUtransRoadsSGID
 
                 clsGlobals.pMxDocument.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGeoSelection, null, null);
 
-
                 ////IFeatureLayer arcFeatLayer = clsGlobals.pGFlayer;
                 //IFeatureLayerDefinition arcFeatureLayerDef = (IFeatureLayerDefinition)clsGlobals.pGFlayer;
                 //string strExistingDefQuery = arcFeatureLayerDef.DefinitionExpression; 
-
 
                 //// select the records that have nulls or blanks
                 //IQueryFilter arcQueryFilter = new QueryFilter();
                 //arcQueryFilter.WhereClause = "(" + strExistingDefQuery + ") AND " + cboChooseFields.Text.ToString().Trim() + " is null";
 
-
-
-
                 //IDataset arcDataset = (IDataset)clsGlobals.pGFlayer.FeatureClass;
                 //ISelectionSet arcSelSet = clsGlobals.pGFlayer.FeatureClass.Select(arcQueryFilter,esriSelectionType.esriSelectionTypeHybrid, esriSelectionOption.esriSelectionOptionNormal, arcDataset.Workspace);
 
                 //clsGlobals.pActiveView.Refresh();
-
-
-
 
             }
             catch (Exception ex)
@@ -94,12 +102,6 @@ namespace PushUtransRoadsSGID
                 "Error Location:" + Environment.NewLine + ex.StackTrace,
                 "Push Utrans Roads to SGID error!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-
-
-
-
-
-
         }
 
         private void clsFrmMakeNullEmptyString_Load(object sender, EventArgs e)
@@ -169,6 +171,7 @@ namespace PushUtransRoadsSGID
                 //}
 
                 clsGlobals.pGFlayer = null;
+                clsGlobals.arcFeatLayer = null;
 
                 // loop through the map's layers and check for the layer with the targeted name (based on the choose layer combobox)
                 for (int i = 0; i < clsGlobals.pMap.LayerCount; i++)
@@ -199,5 +202,110 @@ namespace PushUtransRoadsSGID
                 "Push Utrans Roads to SGID!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
+
+
+        // this method updates the values (to make them empty string) on the selected features in the map, based on the field specified in the dropdown combobox
+        private void btnUpdateFieldValuesEmptyString_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // make sure the user selected a field to edit
+                if (cboChooseFieldToUpdate.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Please select a field from the drop-down menu to edit.", "Select Field", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // make sure the user has selected a layer to edit in the choose layer combobox
+                if (cboChooseLayer.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Please choose a layer from the top drop-down list to base edits on.", "Select Layer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // make sure the user is editing
+                //get the editor extension
+                UID arcUID = new UID();
+                arcUID.Value = "esriEditor.Editor";
+                clsGlobals.arcEditor = clsGlobals.arcApplication.FindExtensionByCLSID(arcUID) as IEditor3;
+
+                // check if editing first
+                if (clsGlobals.arcEditor.EditState == ESRI.ArcGIS.Editor.esriEditState.esriStateNotEditing)
+                {
+                    MessageBox.Show("You must be editing in order to make all selected feature values for the " + cboChooseLayer.Text + " layer on the " + cboChooseFieldToUpdate.Text + " field... to empty string.  Please start editing and then try again.", "Must Be Editing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // show the cursor as busy
+                System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
+
+                // get access to the layer that is specified in the choose layer dropdown box
+                clsGlobals.pGFlayer = null;
+                clsGlobals.arcFeatLayer = null;
+
+                // loop through the map's layers and check for the layer with the targeted name (based on the choose layer combobox)
+                for (int i = 0; i < clsGlobals.pMap.LayerCount; i++)
+                {
+                    if (clsGlobals.pMap.Layer[i].Name == cboChooseLayer.Text)
+                    {
+                        clsGlobals.pGFlayer = (IGeoFeatureLayer)clsGlobals.pMap.Layer[i];
+                        clsGlobals.arcFeatLayer = (IFeatureLayer)clsGlobals.pMap.Layer[i];
+                    }
+                }
+
+                // get access to the selected features in the user specified layer
+                IDisplayTable arcDisplayTable = (IDisplayTable)clsGlobals.arcFeatLayer;
+                ISelectionSet arcSelectionSet = arcDisplayTable.DisplaySelectionSet;
+
+                // make sure there's at least one feature selected in the specified layer
+                if (arcSelectionSet.Count == 0)
+                {
+                    MessageBox.Show("You must select at least on feature in the " + cboChooseLayer.Text + " layer to edit values in the " + cboChooseFieldToUpdate.Text + " field... making them empty string.", "No Features are Selected.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+
+                // confirm the user wants to edit that layer's fields on the selected records
+                DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, converting the vaules in the " + cboChooseFieldToUpdate.Text + " Field to empty string?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    // set some variables for editing the selected features
+                    IFeature arcFeatureToEdit = null;
+                    IEnumIDs arcEnumIDs = arcSelectionSet.IDs;
+                    int iD;
+
+                    // loop through the selected feature in the user specified layer and make the values in the user specified field empty string
+                    while ((iD = arcEnumIDs.Next()) != -1)
+                    {
+                        arcFeatureToEdit = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
+                        clsGlobals.arcEditor.StartOperation();
+
+                        arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboChooseFieldToUpdate.Text), "");
+
+                        arcFeatureToEdit.Store();
+                        clsGlobals.arcEditor.StopOperation(cboChooseFieldToUpdate.Text.ToString() + " to empty string");
+                    }
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                    return;
+                }
+
+
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error Message: " + Environment.NewLine + ex.Message + Environment.NewLine + Environment.NewLine +
+                "Error Source: " + Environment.NewLine + ex.Source + Environment.NewLine + Environment.NewLine +
+                "Error Location:" + Environment.NewLine + ex.StackTrace,
+                "Push Utrans Roads to SGID!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+        }
+
     }
 }
