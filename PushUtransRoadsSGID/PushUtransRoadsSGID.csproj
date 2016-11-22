@@ -96,8 +96,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsBtnAddressRanges.cs" />
     <Compile Include="clsBtnMakeNullEmtpyString.cs" />
     <Compile Include="clsBtnUtransRoadsSGID.cs" />
+    <Compile Include="clsFrmAddressRanges.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clsFrmAddressRanges.Designer.cs">
+      <DependentUpon>clsFrmAddressRanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="clsFrmMakeNullEmptyString.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -129,6 +136,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="clsBtnUtransRoadsSGID.bmp" />
+    <EmbeddedResource Include="clsFrmAddressRanges.resx">
+      <DependentUpon>clsFrmAddressRanges.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="clsFrmMakeNullEmptyString.resx">
       <DependentUpon>clsFrmMakeNullEmptyString.cs</DependentUpon>
     </EmbeddedResource>
@@ -142,6 +152,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TableFields16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="clsBtnAddressRanges.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Group_C_16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

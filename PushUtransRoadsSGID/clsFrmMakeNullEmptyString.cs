@@ -30,6 +30,8 @@ namespace PushUtransRoadsSGID
         {
             try
             {
+                // clear the progress bar, in case it has been used before
+                pBar.Value = 0;
 
                 if (cboChooseFields.SelectedIndex == -1)
                 {
@@ -303,6 +305,12 @@ namespace PushUtransRoadsSGID
                 // show the cursor as busy
                 System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
+                // set up the progress bar on the form to show progress
+                pBar.Visible = true;
+                pBar.Minimum = 1;
+                pBar.Value = 1;
+                pBar.Step = 1;
+
                 // get access to the layer that is specified in the choose layer dropdown box
                 clsGlobals.pGFlayer = null;
                 clsGlobals.arcFeatLayer = null;
@@ -328,6 +336,7 @@ namespace PushUtransRoadsSGID
                     return;
                 }
 
+                pBar.Maximum = arcSelectionSet.Count;
 
                 // confirm the user wants to edit that layer's fields on the selected records
                 DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, converting the vaules in the " + cboChooseFieldToUpdate.Text + " Field to empty string (or Zero if the field type is double or int)?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -351,6 +360,9 @@ namespace PushUtransRoadsSGID
                             clsGlobals.arcEditor.StartOperation();
 
                             arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboChooseFieldToUpdate.Text), "");
+                            
+                            // preform the increment of the progress bar
+                            pBar.PerformStep();
 
                             arcFeatureToEdit.Store();
                             clsGlobals.arcEditor.StopOperation(cboChooseFieldToUpdate.Text.ToString() + " to empty string");
@@ -366,6 +378,9 @@ namespace PushUtransRoadsSGID
 
                             arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboChooseFieldToUpdate.Text), 0);
 
+                            // preform the increment of the progress bar
+                            pBar.PerformStep();
+
                             arcFeatureToEdit.Store();
                             clsGlobals.arcEditor.StopOperation(cboChooseFieldToUpdate.Text.ToString() + " to zero");
                         }
@@ -380,7 +395,6 @@ namespace PushUtransRoadsSGID
                 {
                     return;
                 }
-
             }
             catch (Exception ex)
             {
@@ -391,5 +405,22 @@ namespace PushUtransRoadsSGID
             }
         }
 
+
+        // update the fields to update combobox based on the users input in the select combobox (to ensure less errors when editing)
+        private void cboChooseFields_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                cboChooseFieldToUpdate.SelectedIndex = cboChooseFields.SelectedIndex;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error Message: " + Environment.NewLine + ex.Message + Environment.NewLine + Environment.NewLine +
+                "Error Source: " + Environment.NewLine + ex.Source + Environment.NewLine + Environment.NewLine +
+                "Error Location:" + Environment.NewLine + ex.StackTrace,
+                "Push Utrans Roads to SGID!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+
+        }
     }
 }

@@ -73,6 +73,7 @@ namespace PushUtransRoadsSGID
             //AddItem("{FBF8C3FB-0480-11D2-8D21-080009EE4E51}", 1); //undo command
             //AddItem(new Guid("FBF8C3FB-0480-11D2-8D21-080009EE4E51"), 2); //redo command
             AddItem("{428d8aba-75d9-4ef1-bdb8-24a0abefd795}");  //check for blanks and nulls in dataset
+            AddItem("{e7dab9b0-789d-4027-9634-fa3b85365802}"); // address range checks
         }
 
         public override string Caption
@@ -80,7 +81,7 @@ namespace PushUtransRoadsSGID
             get
             {
                 //TODO: Replace bar caption
-                return "Push UTRANS Roads to SGID";
+                return "AGRC Database Maintenance Tools";
             }
         }
         public override string Name
