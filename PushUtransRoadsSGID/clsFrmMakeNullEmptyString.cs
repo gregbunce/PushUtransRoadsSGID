@@ -31,7 +31,7 @@ namespace PushUtransRoadsSGID
             try
             {
                 // clear the progress bar, in case it has been used before
-                pBar.Value = 0;
+                pBar.Value = 1;
 
                 if (cboChooseFields.SelectedIndex == -1)
                 {
