@@ -231,13 +231,13 @@ namespace PushUtransRoadsSGID
                     // loop through the selected feature in the user specified layer and make the values in the user specified field empty string
                     while ((iD = arcEnumIDs.Next()) != -1)
                     {
-                        clsGlobals.arcFeatureToEdit = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
+                        clsGlobals.arcFeatureToEditSpatial = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
                         clsGlobals.arcEditor.StartOperation();
 
                         // assign values to user choosen fields
 
                         //get the feature's geometry
-                        IGeometry arcEdit_geometry = clsGlobals.arcFeatureToEdit.ShapeCopy;
+                        IGeometry arcEdit_geometry = clsGlobals.arcFeatureToEditSpatial.ShapeCopy;
                         IPolyline arcEdit_polyline = null;
                         IPoint arcEdit_midPoint = null;
 
@@ -280,7 +280,8 @@ namespace PushUtransRoadsSGID
 
                             if (arcFeatureIntersected != null)
                             {
-                                clsGlobals.arcFeatureToEdit.set_Value(clsGlobals.arcFeatureToEdit.Fields.FindField(cboCounty.Text.ToString()), arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("FIPS_STR")).ToString().Trim());
+                                string strCofips = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("FIPS_STR")).ToString().Trim();
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCounty.Text), strCofips);
                             }
                             else
                             {
@@ -310,14 +311,7 @@ namespace PushUtransRoadsSGID
                         }
 
 
-
-
-
-
-
-
-
-                        clsGlobals.arcFeatureToEdit.Store();
+                        clsGlobals.arcFeatureToEditSpatial.Store();
                         clsGlobals.arcEditor.StopOperation("AssignSpatialAttributes");
                     }
 
@@ -328,9 +322,6 @@ namespace PushUtransRoadsSGID
                 {
                     return;
                 }
-
-
-
 
             }
             catch (Exception ex)

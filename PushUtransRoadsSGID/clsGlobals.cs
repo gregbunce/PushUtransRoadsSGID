@@ -105,7 +105,7 @@ namespace PushUtransRoadsSGID
             set;
         }
 
-        public static ESRI.ArcGIS.Geodatabase.IFeature arcFeatureToEdit
+        public static ESRI.ArcGIS.Geodatabase.IFeature arcFeatureToEditSpatial
         {
             get;
             set;
