@@ -69,6 +69,47 @@ namespace PushUtransRoadsSGID
             set;
         }
 
+        public static IFeatureClass arcFeatClass_Counties
+        {
+            get;
+            set;
+        }
+
+        public static IFeatureClass arcFeatClass_Muni
+        {
+            get;
+            set;
+        }
+
+        public static IFeatureClass arcFeatClass_ZipCodes
+        {
+            get;
+            set;
+        }
+
+        public static IFeatureClass arcFeatClass_AddrSys
+        {
+            get;
+            set;
+        }
+
+        public static IWorkspace workspaceSGID
+        {
+            get;
+            set;
+        }
+
+        public static IFeatureWorkspace featureWorkspaceSGID
+        {
+            get;
+            set;
+        }
+
+        public static ESRI.ArcGIS.Geodatabase.IFeature arcFeatureToEdit
+        {
+            get;
+            set;
+        }
 
     }
 }

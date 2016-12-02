@@ -234,6 +234,17 @@ namespace PushUtransRoadsSGID
                     }
                 }
 
+                IDataset arcDataset = (IDataset)clsGlobals.arcFeatLayer;
+                IWorkspace arcWorkspace = arcDataset.Workspace;
+                IWorkspaceEdit arcWorkspaceEdit = (IWorkspaceEdit)arcWorkspace;
+
+                // make sure we're editing the correct workspace
+                if (!(arcWorkspaceEdit.IsBeingEdited()))
+                {
+                    MessageBox.Show("You must be editing the " + cboChooseLayer.Text + " layer in order to proceed.", "Must Be Editing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 // get access to the selected features in the user specified layer
                 IDisplayTable arcDisplayTable = (IDisplayTable)clsGlobals.arcFeatLayer;
                 ISelectionSet arcSelectionSet = arcDisplayTable.DisplaySelectionSet;
@@ -241,12 +252,12 @@ namespace PushUtransRoadsSGID
                 // make sure there's at least one feature selected in the specified layer
                 if (arcSelectionSet.Count == 0)
                 {
-                    MessageBox.Show("You must select at least on feature in the " + cboChooseLayer.Text + " layer to edit values in the " + cboCheckDecimals.Text + " field... making them empty string.", "No Features are Selected.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("You must select at least one feature in the " + cboChooseLayer.Text + " layer to edit values in the " + cboCheckDecimals.Text + " field... making them empty string.", "No Features are Selected.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
                 // confirm the user wants to edit that layer's fields on the selected records
-                DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, rounding the vaules in the " + cboCheckDecimals.Text + " Field to the nearest whole number?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, rounding the values in the " + cboCheckDecimals.Text + " Field to the nearest whole number?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
                     // set some variables for editing the selected features

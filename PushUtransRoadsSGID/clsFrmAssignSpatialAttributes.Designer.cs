@@ -112,9 +112,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(20, 133);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(40, 13);
+            this.label2.Size = new System.Drawing.Size(81, 13);
             this.label2.TabIndex = 1;
-            this.label2.Text = "County";
+            this.label2.Text = "County COFIPS";
             // 
             // label3
             // 
@@ -215,6 +215,7 @@
             this.button1.TabIndex = 11;
             this.button1.Text = "Assign Attributes";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // cboCounty
             // 

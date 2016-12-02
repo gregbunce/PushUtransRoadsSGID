@@ -325,6 +325,17 @@ namespace PushUtransRoadsSGID
                     }
                 }
 
+                IDataset arcDataset = (IDataset)clsGlobals.arcFeatLayer;
+                IWorkspace arcWorkspace = arcDataset.Workspace;
+                IWorkspaceEdit arcWorkspaceEdit = (IWorkspaceEdit)arcWorkspace;
+
+                // make sure we're editing the correct workspace
+                if (!(arcWorkspaceEdit.IsBeingEdited()))
+                {
+                    MessageBox.Show("You must be editing the " + cboChooseLayer.Text + " layer in order to proceed.", "Must Be Editing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 // get access to the selected features in the user specified layer
                 IDisplayTable arcDisplayTable = (IDisplayTable)clsGlobals.arcFeatLayer;
                 ISelectionSet arcSelectionSet = arcDisplayTable.DisplaySelectionSet;
