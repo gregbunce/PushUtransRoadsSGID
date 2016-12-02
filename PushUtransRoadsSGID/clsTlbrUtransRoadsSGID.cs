@@ -72,8 +72,9 @@ namespace PushUtransRoadsSGID
             //BeginGroup(); //Separator
             //AddItem("{FBF8C3FB-0480-11D2-8D21-080009EE4E51}", 1); //undo command
             //AddItem(new Guid("FBF8C3FB-0480-11D2-8D21-080009EE4E51"), 2); //redo command
-            AddItem("{428d8aba-75d9-4ef1-bdb8-24a0abefd795}");  //check for blanks and nulls in dataset
+            AddItem("{428d8aba-75d9-4ef1-bdb8-24a0abefd795}");  // check for blanks and nulls in dataset
             AddItem("{e7dab9b0-789d-4027-9634-fa3b85365802}"); // address range checks
+            AddItem("{49b2f554-ba62-4768-aed8-e8b51b48dc51}"); // assign attributes spatially
         }
 
         public override string Caption

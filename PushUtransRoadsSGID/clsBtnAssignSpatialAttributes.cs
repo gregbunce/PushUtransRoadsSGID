@@ -9,12 +9,12 @@ using ESRI.ArcGIS.ArcMapUI;
 namespace PushUtransRoadsSGID
 {
     /// <summary>
-    /// Summary description for clsBtnAddressRanges.
+    /// Summary description for clsBtnAssignSpatialAttributes.
     /// </summary>
-    [Guid("e7dab9b0-789d-4027-9634-fa3b85365802")]
+    [Guid("49b2f554-ba62-4768-aed8-e8b51b48dc51")]
     [ClassInterface(ClassInterfaceType.None)]
-    [ProgId("PushUtransRoadsSGID.clsBtnAddressRanges")]
-    public sealed class clsBtnAddressRanges : BaseCommand
+    [ProgId("PushUtransRoadsSGID.clsBtnAssignSpatialAttributes")]
+    public sealed class clsBtnAssignSpatialAttributes : BaseCommand
     {
         #region COM Registration Function(s)
         [ComRegisterFunction()]
@@ -67,17 +67,18 @@ namespace PushUtransRoadsSGID
         #endregion
 
         //private IApplication m_application;
-        public clsBtnAddressRanges()
+        public clsBtnAssignSpatialAttributes()
         {
             //
             // TODO: Define values for the public properties
             //
             base.m_category = "AGRC"; //localizable text
-            base.m_caption = "Address Range Checks";  //localizable text
-            base.m_message = "This tool checks for oddities in the address ranges fields for streets data.";  //localizable text 
-            base.m_toolTip = "Check Address Ranges";  //localizable text 
-            base.m_name = "CheckAddressRanges";   //unique id, non-localizable (e.g. "MyCategory_ArcMapCommand")
-            base.m_bitmap = Properties.Resources.Group_C_16;
+            base.m_caption = "Assign Attributes Spatially";  //localizable text
+            base.m_message = "This tool spatially assigns attributes based on user selections.";  //localizable text 
+            base.m_toolTip = "Assign Spatially";  //localizable text 
+            base.m_name = "AssignSpatialAttributes";   //unique id, non-localizable (e.g. "MyCategory_ArcMapCommand")
+            base.m_bitmap = Properties.Resources.CatalogThumbnailCreate_B_16;
+            
         }
 
         #region Overridden Class Methods
@@ -107,8 +108,10 @@ namespace PushUtransRoadsSGID
         /// </summary>
         public override void OnClick()
         {
-            clsFrmAddressRanges checkAddressRanges = new clsFrmAddressRanges();
-            checkAddressRanges.Show(new clsModelessDialog(clsGlobals.arcApplication.hWnd));
+            // TODO: Add clsBtnAssignSpatialAttributes.OnClick implementation
+            clsFrmAssignSpatialAttributes assignSpatially = new clsFrmAssignSpatialAttributes();
+            assignSpatially.Show(new clsModelessDialog(clsGlobals.arcApplication.hWnd));
+
         }
 
         #endregion

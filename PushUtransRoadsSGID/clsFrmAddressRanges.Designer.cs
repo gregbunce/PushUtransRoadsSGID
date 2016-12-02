@@ -191,6 +191,7 @@
             // 
             this.btnRangeOrder.Location = new System.Drawing.Point(178, 147);
             this.btnRangeOrder.Name = "btnRangeOrder";
+            this.btnRangeOrder.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.btnRangeOrder.Size = new System.Drawing.Size(152, 23);
             this.btnRangeOrder.TabIndex = 2;
             this.btnRangeOrder.Text = "Check Range Value Order";
@@ -239,7 +240,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(374, 554);
+            this.ClientSize = new System.Drawing.Size(374, 445);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox3);

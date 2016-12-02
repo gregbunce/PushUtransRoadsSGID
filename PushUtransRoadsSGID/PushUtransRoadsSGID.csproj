@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBtnAddressRanges.cs" />
+    <Compile Include="clsBtnAssignSpatialAttributes.cs" />
     <Compile Include="clsBtnMakeNullEmtpyString.cs" />
     <Compile Include="clsBtnUtransRoadsSGID.cs" />
     <Compile Include="clsFrmAddressRanges.cs">
@@ -104,6 +105,12 @@
     </Compile>
     <Compile Include="clsFrmAddressRanges.Designer.cs">
       <DependentUpon>clsFrmAddressRanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="clsFrmAssignSpatialAttributes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clsFrmAssignSpatialAttributes.Designer.cs">
+      <DependentUpon>clsFrmAssignSpatialAttributes.cs</DependentUpon>
     </Compile>
     <Compile Include="clsFrmMakeNullEmptyString.cs">
       <SubType>Form</SubType>
@@ -139,6 +146,9 @@
     <EmbeddedResource Include="clsFrmAddressRanges.resx">
       <DependentUpon>clsFrmAddressRanges.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="clsFrmAssignSpatialAttributes.resx">
+      <DependentUpon>clsFrmAssignSpatialAttributes.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="clsFrmMakeNullEmptyString.resx">
       <DependentUpon>clsFrmMakeNullEmptyString.cs</DependentUpon>
     </EmbeddedResource>
@@ -148,9 +158,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="clsBtnMakeNullEmtpyString.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\TableFields16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +165,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Group_C_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CatalogThumbnailCreate_B_16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

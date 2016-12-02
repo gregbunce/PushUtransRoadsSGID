@@ -119,8 +119,6 @@ namespace PushUtransRoadsSGID
         {
             try
             {
-
-
                 if (cboCheckDecimals.SelectedIndex == -1)
                 {
                     MessageBox.Show("You must select a field to check.", "Select Field", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -251,7 +249,6 @@ namespace PushUtransRoadsSGID
                 DialogResult dialogResult = MessageBox.Show("Would you like to proceed with editing " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, rounding the vaules in the " + cboCheckDecimals.Text + " Field to the nearest whole number?", "Confirm Edits", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
-
                     // set some variables for editing the selected features
                     IFeature arcFeatureToEdit = null;
                     IEnumIDs arcEnumIDs = arcSelectionSet.IDs;
@@ -272,14 +269,13 @@ namespace PushUtransRoadsSGID
                         clsGlobals.arcEditor.StopOperation(cboCheckDecimals.Text.ToString() + " values rounded");
                     }
 
-                    MessageBox.Show("Done Rounding decimal places for " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, rounding the vaules in the " + cboCheckDecimals.Text + " Field to the nearest whole number.  Don't forget to save edits if you want to retain the changes.", "Done!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show("Done rounding decimal places for " + arcSelectionSet.Count + " features on the " + cboChooseLayer.Text + " Layer, rounding the vaules in the " + cboCheckDecimals.Text + " Field to the nearest whole number.  Don't forget to save edits if you want to retain the changes.", "Done!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
                 }
                 else if (dialogResult == DialogResult.No)
                 {
                     return;
                 }
-
             }
             catch (Exception ex)
             {
