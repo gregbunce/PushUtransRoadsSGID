@@ -271,7 +271,7 @@ namespace PushUtransRoadsSGID
                         arcFeatureToEdit = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
                         clsGlobals.arcEditor.StartOperation();
 
-                        double d = arcFeatureToEdit.get_Value(arcFeatureToEdit.Fields.FindField(cboCheckDecimals.Text));
+                        double d = (double)arcFeatureToEdit.get_Value(arcFeatureToEdit.Fields.FindField(cboCheckDecimals.Text));
                         int intRounded = Convert.ToInt32(d);
 
                         arcFeatureToEdit.set_Value(arcFeatureToEdit.Fields.FindField(cboCheckDecimals.Text), intRounded);

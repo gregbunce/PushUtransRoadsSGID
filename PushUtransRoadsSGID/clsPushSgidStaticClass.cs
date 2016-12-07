@@ -3,6 +3,7 @@ using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geometry;
 using System;
+using ESRI.ArcGIS.ADF;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,6 +70,9 @@ namespace PushUtransRoadsSGID
 
                 IFeatureCursor arcFeatCur = arcFeatClass.Search(arcSpatialFilter, false);
                 IFeature arcFeatureToReturn = arcFeatCur.NextFeature();
+
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(arcFeatCur);
+
                 return arcFeatureToReturn;
             }
             catch (Exception ex)
