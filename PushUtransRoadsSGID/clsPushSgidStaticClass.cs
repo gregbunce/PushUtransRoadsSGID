@@ -97,6 +97,7 @@ namespace PushUtransRoadsSGID
                 clsGlobals.arcFeatClass_Muni = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.BOUNDARIES.Municipalities");
                 clsGlobals.arcFeatClass_ZipCodes = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.BOUNDARIES.ZipCodes");
                 clsGlobals.arcFeatClass_AddrSys = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.LOCATION.AddressSystemQuadrants");
+                clsGlobals.arcFeatClass_USNG = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.INDICES.NationalGrid");
             }
             catch (Exception ex)
             {

@@ -93,6 +93,12 @@ namespace PushUtransRoadsSGID
             set;
         }
 
+        public static IFeatureClass arcFeatClass_USNG
+        {
+            get;
+            set;
+        }
+
         public static IWorkspace workspaceSGID
         {
             get;
