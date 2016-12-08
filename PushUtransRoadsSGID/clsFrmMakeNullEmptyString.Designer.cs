@@ -36,14 +36,15 @@
             this.cboChooseFields = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.pBar = new System.Windows.Forms.ProgressBar();
             this.btnUpdateFieldValuesEmptyString = new System.Windows.Forms.Button();
             this.cboChooseFieldToUpdate = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.cboChooseLayer = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.pBar = new System.Windows.Forms.ProgressBar();
-            this.label3 = new System.Windows.Forms.Label();
+            this.chkNullOnly = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -70,6 +71,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkNullOnly);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.btnSelectBlankNulls);
             this.groupBox1.Controls.Add(this.cboChooseFields);
@@ -133,6 +135,23 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Convert the Selected Features\' Blanks and Nulls to Empty String (or Zero if integ" +
     "er field)";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(26, 80);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(76, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Progress Bar...";
+            // 
+            // pBar
+            // 
+            this.pBar.BackColor = System.Drawing.SystemColors.Control;
+            this.pBar.Location = new System.Drawing.Point(26, 99);
+            this.pBar.Name = "pBar";
+            this.pBar.Size = new System.Drawing.Size(464, 23);
+            this.pBar.TabIndex = 3;
             // 
             // btnUpdateFieldValuesEmptyString
             // 
@@ -213,22 +232,15 @@
             this.label1.TabIndex = 8;
             this.label1.Text = "or Zero if the field is Double, Short Int, or Long Int.";
             // 
-            // pBar
+            // chkNullOnly
             // 
-            this.pBar.BackColor = System.Drawing.SystemColors.Control;
-            this.pBar.Location = new System.Drawing.Point(26, 99);
-            this.pBar.Name = "pBar";
-            this.pBar.Size = new System.Drawing.Size(464, 23);
-            this.pBar.TabIndex = 3;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(26, 80);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(76, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Progress Bar...";
+            this.chkNullOnly.AutoSize = true;
+            this.chkNullOnly.Location = new System.Drawing.Point(342, 22);
+            this.chkNullOnly.Name = "chkNullOnly";
+            this.chkNullOnly.Size = new System.Drawing.Size(73, 17);
+            this.chkNullOnly.TabIndex = 3;
+            this.chkNullOnly.Text = "Nulls Only";
+            this.chkNullOnly.UseVisualStyleBackColor = true;
             // 
             // clsFrmMakeNullEmptyString
             // 
@@ -274,5 +286,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ProgressBar pBar;
+        private System.Windows.Forms.CheckBox chkNullOnly;
     }
 }

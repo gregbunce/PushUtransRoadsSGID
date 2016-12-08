@@ -56,7 +56,13 @@ namespace PushUtransRoadsSGID
                     //check the field type, look for either text or double/integer to determine what type of query to set up
                     if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeString)
                     {
-                        arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null or \"" + cboChooseFields.Text.ToString().Trim() + "\" = ''";
+                        if (chkNullOnly.Checked == true)
+                        {
+                            arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null";                        }
+                        else
+                        {
+                            arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null or \"" + cboChooseFields.Text.ToString().Trim() + "\" = ''";
+                        }
                     }
                     else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeDouble)
                     {
@@ -82,7 +88,14 @@ namespace PushUtransRoadsSGID
                     //check the field type, look for either text or double/integer to determine what type of query to set up
                     if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeString)
                     {
-                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or " + cboChooseFields.Text.ToString().Trim() + " = ''";
+                        if (chkNullOnly.Checked == true)
+                        {
+                            arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                        }
+                        else
+                        {
+                            arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or " + cboChooseFields.Text.ToString().Trim() + " = ''";
+                        }
                     }
                     else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeDouble)
                     {
@@ -108,7 +121,14 @@ namespace PushUtransRoadsSGID
                     //check the field type, look for either text or double/integer to determine what type of query to set up
                     if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeString)
                     {
-                        arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
+                        if (chkNullOnly.Checked == true)
+                        {
+                            arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null";
+                        }
+                        else
+                        {
+                            arcQueryFilter.WhereClause = cboChooseFields.Text.ToString().Trim() + " is null or (" + "LTRIM(RTRIM(" + cboChooseFields.Text.ToString().Trim() + ")) = '')";
+                        }
                     }
                     else if (clsPushSgidStaticClass.GetArcGisFieldType(cboChooseFields.Text) == esriFieldType.esriFieldTypeDouble)
                     {

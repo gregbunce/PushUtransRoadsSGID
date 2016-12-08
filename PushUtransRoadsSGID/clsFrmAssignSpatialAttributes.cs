@@ -503,14 +503,11 @@ namespace PushUtransRoadsSGID
                                 //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                 string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
-                                //Int32 intMeterX = (Int32)arcEdit_midPoint.X;
-                                //Int32 intMeterY = (Int32)arcEdit_midPoint.Y;
-                                //long lngMeterX = (long)arcEdit_midPoint.X;
-                                //long lngMeterY = (long)arcEdit_midPoint.Y;
                                 string strMeterX = arcEdit_midPoint.X.ToString().Trim();
                                 string strMeterY = arcEdit_midPoint.Y.ToString().Trim();
                                 double dblMeterX = (double)arcEdit_midPoint.X;
                                 double dblMeterY = (double)arcEdit_midPoint.Y;
+                                // add .5 to so when we conver to long and the value gets truncated, it will still regain our desired value (if you need more info on this, talk to Bert)
                                 dblMeterX = dblMeterX + .5;
                                 dblMeterY = dblMeterY + .5;
                                 long lngMeterX = (long)dblMeterX;
@@ -557,16 +554,6 @@ namespace PushUtransRoadsSGID
                                 }
 
                                 // trim the x and y meter values to get the needed four characters from each value
-                                //string strMeterX = intMeterX.ToString();// strMeterX.Remove(0, 1);
-                                //string strMeterY = intMeterY.ToString(); // strMeterY.Remove(0, 2);   
-
-                                // remove the values after the decimals
-                                //string[] myStrArrayMeterX = strMeterX.Split('.');
-                                //string[] myStrArrayMeterY = strMeterY.Split('.');
-
-                                //string strMeterX_NoDecimal = myStrArrayMeterX[0].ToString().Trim();
-                                //string strMeterY_NoDecimal = myStrArrayMeterY[0].ToString().Trim();
-
                                 string strMeterX_NoDecimal = lngMeterX.ToString();
                                 string strMeterY_NoDecimal = lngMeterY.ToString();
 
