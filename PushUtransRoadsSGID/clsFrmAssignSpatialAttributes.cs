@@ -124,11 +124,41 @@ namespace PushUtransRoadsSGID
             try
             {
                 // make sure the user selected at least on field to assign
-                if (cboZipRight.SelectedIndex == -1 & cboZipLeft.SelectedIndex == -1 & cboUspsName.SelectedIndex == -1 & cboCounty.SelectedIndex == -1 & cboCityRight.SelectedIndex == -1 & cboCityLeft.SelectedIndex == -1 & cboAddressSystem.SelectedIndex == -1 & cboAddressQuad.SelectedIndex == -1)
+                //var isAnyEmpty = clsPushSgidStaticClass.ScanForControls<ComboBox>(this)
+                //   .Where(x => x.SelectedIndex < 0)
+                //   .Any();
+
+                //if (isAnyEmpty)
+                //    MessageBox.Show("please fill all fields");
+
+                //bool blnNoneSelected = true;
+                string strComboBoxValues = "";
+                foreach (Control c in this.Controls)
+                {
+                    foreach (Control childc in c.Controls)
+                    {
+                        if (childc is ComboBox)
+                        {
+                            if (childc.Name != cboChooseLayer.Name)
+                            {
+                                strComboBoxValues += ((ComboBox)childc).Text;
+                                //blnNoneSelected = false;
+                            }
+                        }
+                    }
+                }
+
+                if (strComboBoxValues == "")
                 {
                     MessageBox.Show("You must select at least one field to assign.", "Make Field Selection", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
+
+                //if (cboZipRight.SelectedIndex == -1 & cboZipLeft.SelectedIndex == -1 & cboUspsName.SelectedIndex == -1 & cboCounty.SelectedIndex == -1 & cboCityRight.SelectedIndex == -1 & cboCityLeft.SelectedIndex == -1 & cboAddressSystem.SelectedIndex == -1 & cboAddressQuad.SelectedIndex == -1)
+                //{
+                //    MessageBox.Show("You must select at least one field to assign.", "Make Field Selection", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                //    return;
+                //}
 
                 // make sure the user is editing
                 //get the editor extension
@@ -225,6 +255,27 @@ namespace PushUtransRoadsSGID
                 {
                     strFieldsToBeEdited = cboAddressQuad.Text.ToString() + ", ";
                 }
+                if (cboGrid100K.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = cboGrid100K.Text.ToString() + ", ";
+                }
+                if (cboGrid1Mil.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = cboGrid1Mil.Text.ToString() + ", ";
+                }
+                if (cboUSNG.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = cboUSNG.Text.ToString() + ", ";
+                }
+                if (cboMidX.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = cboMidX.Text.ToString() + ", ";
+                }
+                if (cboMidY.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = cboMidY.Text.ToString() + ", ";
+                }
+
                 //remove the last two chararcters -- ie: ', '
                 strFieldsToBeEdited = strFieldsToBeEdited.Remove(strFieldsToBeEdited.Length - 2);
 
@@ -442,7 +493,7 @@ namespace PushUtransRoadsSGID
                             }
                         }
                         // unique_id field
-                        if (cboUSNG.SelectedIndex == -1)
+                        if (cboUSNG.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
                             IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_USNG);
@@ -520,7 +571,7 @@ namespace PushUtransRoadsSGID
                                     //string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                     string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
 
-                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboUSNG.Text), strGrid100k);
+                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid100K.Text), strGrid100k);
                                 }
                             }
                                 
@@ -535,7 +586,7 @@ namespace PushUtransRoadsSGID
                                     string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                     //string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
 
-                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboUSNG.Text), strGrid1Mil);
+                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid1Mil.Text), strGrid1Mil);
                                 }
                             }
                         }
