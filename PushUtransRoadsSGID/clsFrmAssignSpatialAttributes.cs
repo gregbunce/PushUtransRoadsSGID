@@ -225,55 +225,55 @@ namespace PushUtransRoadsSGID
                 string strFieldsToBeEdited = "";
                 if (cboZipRight.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboZipRight.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboZipRight.Text.ToString() + ", ";
                 }
                 if (cboZipLeft.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboZipLeft.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboZipLeft.Text.ToString() + ", ";
                 }
                 if (cboCounty.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboCounty.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboCounty.Text.ToString() + ", ";
                 }
                 if (cboUspsName.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboUspsName.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboUspsName.Text.ToString() + ", ";
                 }
                 if (cboCityRight.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboCityRight.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboCityRight.Text.ToString() + ", ";
                 }
                 if (cboCityLeft.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboCityLeft.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboCityLeft.Text.ToString() + ", ";
                 }
                 if (cboAddressSystem.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboAddressSystem.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddressSystem.Text.ToString() + ", ";
                 }
                 if (cboAddressQuad.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboAddressQuad.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddressQuad.Text.ToString() + ", ";
                 }
                 if (cboGrid100K.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboGrid100K.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboGrid100K.Text.ToString() + ", ";
                 }
                 if (cboGrid1Mil.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboGrid1Mil.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboGrid1Mil.Text.ToString() + ", ";
                 }
                 if (cboUSNG.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboUSNG.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboUSNG.Text.ToString() + ", ";
                 }
                 if (cboMidX.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboMidX.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboMidX.Text.ToString() + ", ";
                 }
                 if (cboMidY.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = cboMidY.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboMidY.Text.ToString() + ", ";
                 }
 
                 //remove the last two chararcters -- ie: ', '
@@ -503,8 +503,12 @@ namespace PushUtransRoadsSGID
                                 //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                 string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
-                                string strMeterX = arcEdit_midPoint.X.ToString();
-                                string strMeterY = arcEdit_midPoint.Y.ToString();
+                                //Int32 intMeterX = (Int32)arcEdit_midPoint.X;
+                                //Int32 intMeterY = (Int32)arcEdit_midPoint.Y;
+                                long lngMeterX = (long)arcEdit_midPoint.X;
+                                long lngMeterY = (long)arcEdit_midPoint.Y;
+                                string strMeterX = arcEdit_midPoint.X.ToString().Trim();
+                                string strMeterY = arcEdit_midPoint.Y.ToString().Trim();
                                 string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
                                 string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
                                 string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
@@ -517,27 +521,59 @@ namespace PushUtransRoadsSGID
 
                                 if (blnIsNumbericStreetName)
                                 {
-                                    strFullName = "_" + strStreetName + "_" + strSufDir;
+                                    if (strStreetName != "")
+                                    {
+                                        strFullName = "_" + strStreetName + "_" + strSufDir;
+                                    }
+                                    else
+                                    {
+                                        strFullName = "";
+                                    }
                                 }
                                 else
                                 {
                                     // concatinate the streetname and streettype
-                                    if (strStreetType != "")
+                                    if (strStreetName != "")
                                     {
-                                        strFullName = "_" + strStreetName + "_" + strStreetType;
+                                        if (strStreetType != "")
+                                        {
+                                            strFullName = "_" + strStreetName + "_" + strStreetType;
+                                        }
+                                        else
+                                        {
+                                            strFullName = "_" + strStreetName;
+                                        }
                                     }
                                     else
                                     {
-                                        strFullName = "_" + strStreetName;
+                                        strFullName = "";
                                     }
                                 }
 
                                 // trim the x and y meter values to get the needed four characters from each value
-                                strMeterX = strMeterX.Remove(0, 1);
-                                strMeterY = strMeterY.Remove(0, 2);    
+                                //string strMeterX = intMeterX.ToString();// strMeterX.Remove(0, 1);
+                                //string strMeterY = intMeterY.ToString(); // strMeterY.Remove(0, 2);   
+
+                                // remove the values after the decimals
+                                //string[] myStrArrayMeterX = strMeterX.Split('.');
+                                //string[] myStrArrayMeterY = strMeterY.Split('.');
+
+                                //string strMeterX_NoDecimal = myStrArrayMeterX[0].ToString().Trim();
+                                //string strMeterY_NoDecimal = myStrArrayMeterY[0].ToString().Trim();
+
+                                string strMeterX_NoDecimal = lngMeterX.ToString();
+                                string strMeterY_NoDecimal = lngMeterY.ToString();
+
+                                // remove the begining characters
+                                strMeterX_NoDecimal = strMeterX_NoDecimal.Remove(0, 1);
+                                strMeterY_NoDecimal = strMeterY_NoDecimal.Remove(0,2);
+
+                                //remove the ending characters
+                                strMeterY_NoDecimal = strMeterY_NoDecimal.Remove(strMeterY_NoDecimal.Length -1);
+                                strMeterX_NoDecimal = strMeterX_NoDecimal.Remove(strMeterX_NoDecimal.Length -1);
 
                                 // piece all the unique_id fields together
-                                strUSNG_UniqueID = strGrid1Mil + strGrid100k + strMeterX + strMeterY + strFullName;
+                                strUSNG_UniqueID = strGrid1Mil + strGrid100k + strMeterX_NoDecimal + strMeterY_NoDecimal + strFullName;
 
                                 //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressSystem.Text), strGridName);
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboUSNG.Text), strUSNG_UniqueID);
