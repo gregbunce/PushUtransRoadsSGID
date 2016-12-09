@@ -503,30 +503,66 @@ namespace PushUtransRoadsSGID
                                 //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                 string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
-                                string strMeterX = arcEdit_midPoint.X.ToString().Trim();
-                                string strMeterY = arcEdit_midPoint.Y.ToString().Trim();
-                                double dblMeterX = (double)arcEdit_midPoint.X;
-                                double dblMeterY = (double)arcEdit_midPoint.Y;
+                                string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
+                                string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
+                                string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
+
+                                string strGrid1Mil_UTMZone = strGrid1Mil.Substring(0, 2);
+                                string strFullName = "";
+                                string strUSNG_UniqueID = "";
+                                double dblMeterX;
+                                double dblMeterY;
+                                ISpatialReference utm12 = arcEdit_midPoint.SpatialReference;
+                                double dblUtm12_X = arcEdit_midPoint.X;
+                                double dblUtm12_Y = arcEdit_midPoint.Y;
+
+                                // reproject the point if it's in utm zone 11
+                                if (strGrid1Mil_UTMZone == "11")
+                                {
+                                    ISpatialReferenceFactory srFactory = new SpatialReferenceEnvironmentClass();
+                                    IProjectedCoordinateSystem utm11 = srFactory.CreateProjectedCoordinateSystem((int)esriSRProjCSType.esriSRProjCS_NAD1983UTM_11N);
+
+                                    IPoint arcMidPoint_UTM11 = new PointClass();
+                                    arcMidPoint_UTM11.PutCoords(dblUtm12_X, dblUtm12_Y);
+                                    IGeometry arcGeomMidPnt_UTM11 = arcMidPoint_UTM11;
+                                    arcGeomMidPnt_UTM11.SpatialReference = utm12;
+
+                                    arcGeomMidPnt_UTM11.Project(utm11);
+                                    arcMidPoint_UTM11 = arcGeomMidPnt_UTM11 as IPoint;
+
+                                    dblMeterX = (double)arcMidPoint_UTM11.X;
+                                    dblMeterY = (double)arcMidPoint_UTM11.Y;
+
+                                }
+                                else
+                                {
+                                    dblMeterX = (double)arcEdit_midPoint.X;
+                                    dblMeterY = (double)arcEdit_midPoint.Y;
+                                }
+
                                 // add .5 to so when we conver to long and the value gets truncated, it will still regain our desired value (if you need more info on this, talk to Bert)
                                 dblMeterX = dblMeterX + .5;
                                 dblMeterY = dblMeterY + .5;
                                 long lngMeterX = (long)dblMeterX;
                                 long lngMeterY = (long)dblMeterY;
-                                string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
-                                string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
-                                string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
-                                string strFullName = "";
-                                string strUSNG_UniqueID = "";
+
 
                                 // check if the utrans road is numberic or integer
                                 int intStreetNameIsNum;
                                 bool blnIsNumbericStreetName = int.TryParse(strStreetName, out intStreetNameIsNum);
 
                                 if (blnIsNumbericStreetName)
-                                {
+                                { 
                                     if (strStreetName != "")
                                     {
-                                        strFullName = "_" + strStreetName + "_" + strSufDir;
+                                        if (strStreetType != "")
+                                        {
+                                            strFullName = "_" + strStreetName + "_" + strSufDir;
+                                        }
+                                        else
+                                        {
+                                            strFullName = "_" + strStreetName;
+                                        }
                                     }
                                     else
                                     {
