@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ESRI.ArcGIS.ADF.BaseClasses;
@@ -111,6 +113,13 @@ namespace PushUtransRoadsSGID
         {
             try
             {
+                //setup a file stream and a stream writer to write out the addresses that do not have a nearby street or a street out of range
+                string path = @"C:\temp\DeleteDupVerts" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") +".txt";
+                System.IO.FileStream fileStream = new System.IO.FileStream(path, FileMode.Create);
+                StreamWriter streamWriter = new StreamWriter(fileStream);
+                streamWriter.WriteLine("UniqueID" + "," + "FeatureOID" + "," + "VertIndex1" + "," + "VertIndex2");
+                int intUniqueID = 0;
+
                 // get access to the current arcmap variables
                 clsPushSgidStaticClass.GetCurrentMapDocVariables();
 
@@ -121,6 +130,7 @@ namespace PushUtransRoadsSGID
                 clsGlobals.arcFeatLayer = null;
                 IFeatureLayer arcFeatureLayerVertPnts = null;
                 IFeatureClass arcFeatureClassVertPnts = null;
+                //var listOfIndexesToRemove = new List<Int32>();
 
                 // loop through the map's layers and check for the layer with the targeted name
                 for (int i = 0; i < clsGlobals.pMap.LayerCount; i++)
@@ -196,11 +206,11 @@ namespace PushUtransRoadsSGID
 
                         // Loop through this features verticies.
                         // Get the feature's geometry.
-                        IGeometry arcEdit_geometry = clsGlobals.arcFeatureToEditSpatial.ShapeCopy;
+                        IGeometry arcEdit_geometry = clsGlobals.arcFeatureToEditSpatial.Shape;
                         IPolyline arcEdit_polyline = arcEdit_geometry as IPolyline;
 
                         // get a point collection
-                        IPointCollection pointCollection = (IPointCollection) arcEdit_polyline;
+                        IPointCollection4 pointCollection = (IPointCollection4) arcEdit_polyline;
                         IPoint currPoint = null;
                         IPoint previousPoint = null;
 
@@ -208,6 +218,7 @@ namespace PushUtransRoadsSGID
                         for (int i = 0; i < pointCollection.PointCount; i++)
                         {
                             // Get the current point.
+                            currPoint = null;
                             currPoint = pointCollection.get_Point(i);
                             //MessageBox.Show("X:" + currPoint.X + " , Y:" + currPoint.Y);
                             
@@ -221,78 +232,119 @@ namespace PushUtransRoadsSGID
                                 proximityOperator = currGeometry as IProximityOperator;
                                 
                                 // Check distance to the previous vertex.
-                                double distance = proximityOperator.ReturnDistance(previousGeometry);
-                                
-                                //MessageBox.Show(distance.ToString());
+                                double distBetweenCurrPrevPnts = proximityOperator.ReturnDistance(previousGeometry);
                                 
                                 // Check if distance is less than 1 meter.
-                                if (distance <= 1)
+                                if (distBetweenCurrPrevPnts <= 3)
                                 {
                                     //MessageBox.Show(distance.ToString() + " is less than 1 meter.");
 
                                     // Check if the the current point intersects any other vertices, before we delete it.
                                     // If it does, then check the current point to see if intersects any other vertices, before we delete it.
-                                    ISpatialFilter spatialFilter = new SpatialFilterClass();
-                                    spatialFilter.Geometry = currGeometry;
-                                    spatialFilter.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
+                                    ISpatialFilter spatialFilterCurr = new SpatialFilterClass();
+                                    spatialFilterCurr.Geometry = currGeometry;
+                                    spatialFilterCurr.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
 
-                                    IFeatureCursor featureCursor = arcFeatureClassVertPnts.Search(spatialFilter, false);
-                                    IFeature feature = null;
-                                    int numberOfVertices = 0;
+                                    IFeatureCursor featureCursorCurr = arcFeatureClassVertPnts.Search(spatialFilterCurr, false);
+                                    IFeature featureCurr = null;
+                                    int vertAtCurrPnt = 0;
 
-                                    while ((feature = featureCursor.NextFeature()) != null)
+                                    while ((featureCurr = featureCursorCurr.NextFeature()) != null)
                                     {
-                                        numberOfVertices = numberOfVertices + 1;
+                                        vertAtCurrPnt = vertAtCurrPnt + 1;
                                     }
 
                                     // Check if we can delete this vertex
-                                    if (numberOfVertices > 1)
+                                    if (vertAtCurrPnt > 1)
                                     {
-                                        // co-incident points located at the currPoint here - it can't be deleted
-                                        //MessageBox.Show("We have overlapping Vert");
-                                        //MessageBox.Show("Cant delete current point at: " + currPoint.X + ", " +
-                                        //                currPoint.Y);
-
                                         // now check the if we can delete the previous point (as we can't delete the current point b/c it is co-incident)
+                                        ISpatialFilter spatialFilterPrev = new SpatialFilterClass();
+                                        spatialFilterPrev.Geometry = previousGeometry;
+                                        spatialFilterPrev.SpatialRel = esriSpatialRelEnum.esriSpatialRelIntersects;
 
+                                        IFeatureCursor featureCursorPrev = arcFeatureClassVertPnts.Search(spatialFilterPrev, false);
+                                        IFeature featurePrev = null;
+                                        int vertsAtPrevPnt = 0;
+
+                                        while ((featurePrev = featureCursorPrev.NextFeature()) != null)
+                                        {
+                                            vertsAtPrevPnt = vertsAtPrevPnt + 1;
+                                        }
+
+                                        // Check if we can delete this vertex
+                                        if (vertsAtPrevPnt > 1)
+                                        {
+                                            // can delete this one either, so log it in the text file so we can inspect it manual
+                                            intUniqueID = intUniqueID + 1;
+                                            streamWriter.WriteLine(intUniqueID + "," + clsGlobals.arcFeatureToEditSpatial.OID + "," + i + "," + Convert.ToString(i-1));
+
+                                            //MessageBox.Show("Can't Delete either vertex for this 1 meter duplicate.  Help!  Need a human!");
+                                        }
+                                        else
+                                        {
+                                            // Delete the previous vertex.
+
+                                            // Add this index to the list of 
+                                            //listOfIndexesToRemove.Add(i);
+
+                                            // Remove the point from the collection.
+                                            pointCollection.RemovePoints(i - 1, 1);
+
+                                            // reset the point collection, now that the point has been removed
+                                            //pointCollection.ReplacePointCollection(i, i - pointCollection.PointCount, pointCollection);
+
+                                            // Replace the features shape with the newly modified point collection.
+                                            //clsGlobals.arcFeatureToEditSpatial.Shape = pointCollection as IGeometry;
+                                            //clsGlobals.arcFeatureToEditSpatial.Store();
+                                        }
+
+                                        // release the feature cursor
+                                        System.Runtime.InteropServices.Marshal.ReleaseComObject(featureCursorPrev);
                                     }
                                     else
                                     {
-                                       // IEngineSketchOperation sketchOp = new EngineSketchOperation();
-                                       // //Find the Modify Feature task and set it as the current task
-                                       // IEngineEditor m_engineEditor;
-                                       // esriEngineSketchOperationType opType = esriEngineSketchOperationType.esriEngineSketchOperationGeneral;
-                                       // m_engineEditor = new EngineEditor(); //this class is a singleton
-                                       //// m_editLayer = m_engineEditor as IEngineEditLayers;
-                                       // IEngineEditTask editTask = m_engineEditor.GetTaskByUniqueName("ControlToolsEditing_ModifyFeatureTask");
-                                       // m_engineEditor.CurrentTask = editTask;
-                                       // sketchOp.Start(m_engineEditor);
+                                        // Delete the current vertex
+                                        // Add this index to the list of 
+                                        //listOfIndexesToRemove.Add(i);
 
-                                        // No co-incidnet points, it can be deleted
-                                        pointCollection.RemovePoints(i,1);
-                                        pointCollection.UpdatePoint(i,currPoint);
-                                        //sketchOp.SetMenuString("Delete Vertex");
-                                        //opType = esriEngineSketchOperationType.esriEngineSketchOperationVertexDeleted;
+                                        // Remove the point from the collection.
+                                        pointCollection.RemovePoints(i, 1);
+                                        
+                                        // reset the point collection, now that the point has been removed
+                                        //pointCollection.ReplacePointCollection(i,i- pointCollection.PointCount,pointCollection);
 
-                                        //sketchOp.Finish(null, opType, null);
+                                        // Replace the features shape with the newly modified point collection.
+                                        //clsGlobals.arcFeatureToEditSpatial.Shape = pointCollection as IGeometry;
+                                        //clsGlobals.arcFeatureToEditSpatial.Store();
                                     }
 
                                     // release the feature cursor
-                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(featureCursor);
+                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(featureCursorCurr);
                                 }
-
-
-
                             }
 
                             
                             // Set this current point to the next point, so next time through the iteration we can check the distance between them.
+                            previousPoint = null;
                             previousPoint = currPoint;
                         }
 
+
+                        //// Remove the ID'd verticies from this segment
+                        //foreach (var index in listOfIndexesToRemove)
+                        //{
+                        //    // Remove the point from the collection.
+                        //    pointCollection.RemovePoints(index, 1);
+                        //}
+
+                        // Replace the features shape with the newly modified point collection.
+                        clsGlobals.arcFeatureToEditSpatial.Shape = pointCollection as IGeometry;
                         clsGlobals.arcFeatureToEditSpatial.Store();
                         clsGlobals.arcEditor.StopOperation("RemovedDuplicateVertices");
                     }
+
+                    //close the stream writer
+                    streamWriter.Close();
 
                     MessageBox.Show(
                         "Done updating " + arcSelectionSet.Count +
