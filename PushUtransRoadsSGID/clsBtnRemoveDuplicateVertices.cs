@@ -119,6 +119,9 @@ namespace PushUtransRoadsSGID
                 StreamWriter streamWriter = new StreamWriter(fileStream);
                 streamWriter.WriteLine("UniqueID" + "," + "FeatureOID" + "," + "VertIndex1" + "," + "VertIndex2");
                 int intUniqueID = 0;
+                bool updatePreviousPnt;
+                int numberOfVerticesRemovedFromPntCollection;
+                int vertexIndexToRemove;
 
                 // get access to the current arcmap variables
                 clsPushSgidStaticClass.GetCurrentMapDocVariables();
@@ -146,7 +149,6 @@ namespace PushUtransRoadsSGID
                         arcFeatureLayerVertPnts = (IFeatureLayer)clsGlobals.pMap.Layer[i];
                         arcFeatureClassVertPnts = arcFeatureLayerVertPnts.FeatureClass;
                     }
-
                 }
 
                 // make sure the user is editing
@@ -201,6 +203,9 @@ namespace PushUtransRoadsSGID
                     int iD;
                     while ((iD = arcEnumIDs.Next()) != -1)
                     {
+                        vertexIndexToRemove = 0;
+                        numberOfVerticesRemovedFromPntCollection = 0;
+
                         clsGlobals.arcFeatureToEditSpatial = clsGlobals.arcFeatLayer.FeatureClass.GetFeature(iD);
                         clsGlobals.arcEditor.StartOperation();
 
@@ -215,11 +220,20 @@ namespace PushUtransRoadsSGID
                         IPoint previousPoint = null;
 
                         // Iterate the point collection array (the first point is the start of the line and last is the end of the line).
-                        for (int i = 0; i < pointCollection.PointCount; i++)
+                        for (int i = 0; i < pointCollection.PointCount + numberOfVerticesRemovedFromPntCollection; i++)
                         {
+                            // Reset the boolean value.
+                            updatePreviousPnt = true;
+
+                            // Reset the number of vertices removed to zero 
+                            //numberOfVerticesRemovedFromPntCollection = 0;
+                            //vertexIndexToRemove = 0;
+
                             // Get the current point.
                             currPoint = null;
-                            currPoint = pointCollection.get_Point(i);
+                            // This is the problem as it's setting the current i point, but this should be a reference to the original index
+                            //currPoint = pointCollection.get_Point(i);
+                            currPoint = pointCollection.get_Point(i - numberOfVerticesRemovedFromPntCollection);
                             //MessageBox.Show("X:" + currPoint.X + " , Y:" + currPoint.Y);
                             
                             // Check if the previous point has been assigned yet (if not, it's the first itteration of this line segment)
@@ -232,10 +246,10 @@ namespace PushUtransRoadsSGID
                                 proximityOperator = currGeometry as IProximityOperator;
                                 
                                 // Check distance to the previous vertex.
-                                double distBetweenCurrPrevPnts = proximityOperator.ReturnDistance(previousGeometry);
+                                double distBetweenCurrAndPrevPnt = proximityOperator.ReturnDistance(previousGeometry);
                                 
                                 // Check if distance is less than 1 meter.
-                                if (distBetweenCurrPrevPnts <= 3)
+                                if (distBetweenCurrAndPrevPnt <= 3)
                                 {
                                     //MessageBox.Show(distance.ToString() + " is less than 1 meter.");
 
@@ -257,6 +271,7 @@ namespace PushUtransRoadsSGID
                                     // Check if we can delete this vertex
                                     if (vertAtCurrPnt > 1)
                                     {
+                                        // There's more than one vertex here at the current vertex/point, so we cant' delete it, check the the previous
                                         // now check the if we can delete the previous point (as we can't delete the current point b/c it is co-incident)
                                         ISpatialFilter spatialFilterPrev = new SpatialFilterClass();
                                         spatialFilterPrev.Geometry = previousGeometry;
@@ -287,9 +302,19 @@ namespace PushUtransRoadsSGID
                                             // Add this index to the list of 
                                             //listOfIndexesToRemove.Add(i);
 
-                                            // Remove the point from the collection.
-                                            pointCollection.RemovePoints(i - 1, 1);
+                                            vertexIndexToRemove = i - numberOfVerticesRemovedFromPntCollection;
 
+                                            // test replacing the point collection before we do anything with it
+                                            //pointCollection.ReplacePointCollection(0,pointCollection.PointCount,pointCollection);
+                                            //MessageBox.Show("before remove: " + pointCollection.PointCount);
+                                            // Remove the point from the collection.
+                                            //pointCollection.RemovePoints(i - 1, 1);
+                                            pointCollection.RemovePoints(vertexIndexToRemove - 1, 1);
+                                            //MessageBox.Show("after remove: " + pointCollection.PointCount);
+
+                                            // Increment the total number of vertices removed
+                                            numberOfVerticesRemovedFromPntCollection =
+                                                numberOfVerticesRemovedFromPntCollection + 1;
                                             // reset the point collection, now that the point has been removed
                                             //pointCollection.ReplacePointCollection(i, i - pointCollection.PointCount, pointCollection);
 
@@ -307,9 +332,23 @@ namespace PushUtransRoadsSGID
                                         // Add this index to the list of 
                                         //listOfIndexesToRemove.Add(i);
 
+                                        vertexIndexToRemove = i - numberOfVerticesRemovedFromPntCollection;
+
+                                        // test replacing the point collection before we do anything with it
+                                        //pointCollection.ReplacePointCollection(0, pointCollection.PointCount, pointCollection);
+                                        //MessageBox.Show("before remove: " + pointCollection.PointCount);
                                         // Remove the point from the collection.
-                                        pointCollection.RemovePoints(i, 1);
-                                        
+                                        //pointCollection.RemovePoints(i, 1);
+                                        pointCollection.RemovePoints(vertexIndexToRemove, 1);
+                                        //MessageBox.Show("after remove: " + pointCollection.PointCount);
+
+                                        // Increment the total number of vertices removed
+                                        numberOfVerticesRemovedFromPntCollection =
+                                            numberOfVerticesRemovedFromPntCollection + 1;
+
+                                        // since we are removing this current point, make sure we don't assign it as the previousPoint (in other words keep the active previous point for the next iterattion)
+                                        updatePreviousPnt = false;
+
                                         // reset the point collection, now that the point has been removed
                                         //pointCollection.ReplacePointCollection(i,i- pointCollection.PointCount,pointCollection);
 
@@ -325,8 +364,13 @@ namespace PushUtransRoadsSGID
 
                             
                             // Set this current point to the next point, so next time through the iteration we can check the distance between them.
-                            previousPoint = null;
-                            previousPoint = currPoint;
+                            if (updatePreviousPnt)
+                            {
+                                previousPoint = null;
+                                previousPoint = currPoint;                                
+                            }
+
+                            //MessageBox.Show("total times though the loop: " + i);
                         }
 
 
