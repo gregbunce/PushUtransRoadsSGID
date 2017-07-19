@@ -87,8 +87,8 @@ namespace PushUtransRoadsSGID
             //
             base.m_category = "AGRC"; //localizable text
             base.m_caption = "  Remove Duplicate Vertices"; //localizable text
-            base.m_message = "Works on the selected features in REMOVE_DUP_VERTS layer (Also requires VERT_PNTS to be run on whole area and Layer in Map) and removes the vertices if they are within 1 meter, but keeps the coincident one (shared with other feature one)."; //localizable text
-            base.m_toolTip = "Remove non-coincident vertices within 1 meter of eachother."; //localizable text 
+            base.m_message = "Works on the selected features in REMOVE_DUP_VERTS layer (Also requires VERT_PNTS to be run on whole area and Layer in Map) and removes the vertices if they are within 3 meter, but keeps the coincident one (shared with other feature one)."; //localizable text
+            base.m_toolTip = "Remove non-coincident vertices within 3 meter of eachother."; //localizable text 
             base.m_name = "RemoveDupVert"; //unique id, non-localizable (e.g. "MyCategory_ArcMapCommand")
             base.m_bitmap = Properties.Resources.TmCompareSelectedFeatures16;
         }
@@ -220,6 +220,7 @@ namespace PushUtransRoadsSGID
                         IPoint previousPoint = null;
 
                         // Iterate the point collection array (the first point is the start of the line and last is the end of the line).
+                        // I added the numberOfVerticesRemovedFromPntCollection variable in order to preserve the initial point collection iterations (it's needed in order to loop through all the original vertices)
                         for (int i = 0; i < pointCollection.PointCount + numberOfVerticesRemovedFromPntCollection; i++)
                         {
                             // Reset the boolean value.
