@@ -503,9 +503,9 @@ namespace PushUtransRoadsSGID
                                 //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                 string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
-                                string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
-                                string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
-                                string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
+                                //string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
+                                //string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
+                                //string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
 
                                 string strGrid1Mil_UTMZone = strGrid1Mil.Substring(0, 2);
                                 string strFullName = "";
@@ -547,47 +547,58 @@ namespace PushUtransRoadsSGID
                                 long lngMeterY = (long)dblMeterY;
 
 
-                                // check if the utrans road is numberic or integer
-                                int intStreetNameIsNum;
-                                bool blnIsNumbericStreetName = int.TryParse(strStreetName, out intStreetNameIsNum);
-
-                                if (blnIsNumbericStreetName)
-                                { 
-                                    if (strStreetName != "")
-                                    {
-                                        if (strStreetType != "")
-                                        {
-                                            strFullName = "_" + strStreetName + "_" + strSufDir;
-                                        }
-                                        else
-                                        {
-                                            strFullName = "_" + strStreetName;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        strFullName = "";
-                                    }
-                                }
-                                else
+                                // check if it's a utrans/road schema polyline >>> having streetname, streettype, or sufdir fields
+                                if (cboChooseLayer.Text.Contains("Roads") | cboChooseLayer.Text.Contains("StatewideStreets"))
                                 {
-                                    // concatinate the streetname and streettype
-                                    if (strStreetName != "")
-                                    {
-                                        if (strStreetType != "")
+                                    string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
+                                    string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
+                                    string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
+
+                                    // check if the utrans road is numberic or integer
+                                    int intStreetNameIsNum;
+                                    bool blnIsNumbericStreetName = int.TryParse(strStreetName, out intStreetNameIsNum);
+
+                                    if (blnIsNumbericStreetName)
+                                    { 
+                                        if (strStreetName != "")
                                         {
-                                            strFullName = "_" + strStreetName + "_" + strStreetType;
+                                            if (strStreetType != "")
+                                            {
+                                                strFullName = "_" + strStreetName + "_" + strSufDir;
+                                            }
+                                            else
+                                            {
+                                                strFullName = "_" + strStreetName;
+                                            }
                                         }
                                         else
                                         {
-                                            strFullName = "_" + strStreetName;
+                                            strFullName = "";
                                         }
                                     }
                                     else
                                     {
-                                        strFullName = "";
+                                        // concatinate the streetname and streettype
+                                        if (strStreetName != "")
+                                        {
+                                            if (strStreetType != "")
+                                            {
+                                                strFullName = "_" + strStreetName + "_" + strStreetType;
+                                            }
+                                            else
+                                            {
+                                                strFullName = "_" + strStreetName;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            strFullName = "";
+                                        }
                                     }
+                                    // end of check if utrans/roads segment
                                 }
+
+
 
                                 // trim the x and y meter values to get the needed four characters from each value
                                 string strMeterX_NoDecimal = lngMeterX.ToString();
