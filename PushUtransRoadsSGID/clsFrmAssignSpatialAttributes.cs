@@ -639,7 +639,7 @@ namespace PushUtransRoadsSGID
                                     { 
                                         if (strStreetName != "")
                                         {
-                                            if (strStreetType != "")
+                                            if (strSufDir != "")
                                             {
                                                 strFullName = "_" + strStreetName + "_" + strSufDir;
                                             }
@@ -689,7 +689,7 @@ namespace PushUtransRoadsSGID
                                     {
                                         if (strStreetName != "")
                                         {
-                                            if (strStreetType != "")
+                                            if (strSufDir != "")
                                             {
                                                 strFullName = "_" + strStreetName + "_" + strSufDir;
                                             }
