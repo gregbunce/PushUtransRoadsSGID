@@ -58,7 +58,8 @@ namespace PushUtransRoadsSGID
                     {
                         if (chkNullOnly.Checked == true)
                         {
-                            arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null";                        }
+                            arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null";
+                        }
                         else
                         {
                             arcQueryFilter.WhereClause = "\"" + cboChooseFields.Text.ToString().Trim() + "\" is null or \"" + cboChooseFields.Text.ToString().Trim() + "\" = ''";

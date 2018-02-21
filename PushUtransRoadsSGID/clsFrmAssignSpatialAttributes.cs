@@ -23,7 +23,7 @@ namespace PushUtransRoadsSGID
         }
 
 
-        // this method is run when the form loads - and populates the combobox with the map's layers
+        // This method is run when the form loads - and populates the combobox with the map's layers.
         private void clsFrmAssignSpatialAttributes_Load(object sender, EventArgs e)
         {
             try
@@ -46,16 +46,8 @@ namespace PushUtransRoadsSGID
             }
         }
 
-        private void label5_Click(object sender, EventArgs e)
-        {
 
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        // This method gets called when the layer name (in combo-box) gets changed.
         private void cboChooseLayer_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
@@ -77,12 +69,16 @@ namespace PushUtransRoadsSGID
                 }
 
                 // clear out the old items in the list
-                cboAddressQuad.Items.Clear();
-                cboAddressSystem.Items.Clear();
+                cboAddressQuadRight.Items.Clear();
+                cboAddressQuadLeft.Items.Clear();
+                cboAddrSysLeft.Items.Clear();
+                cboAddrSysRight.Items.Clear();
                 cboCityLeft.Items.Clear();
                 cboCityRight.Items.Clear();
-                cboCounty.Items.Clear();
-                cboUspsName.Items.Clear();
+                cboCountyRight.Items.Clear();
+                cboCountyLeft.Items.Clear();
+                cboPostalCommRight.Items.Clear();
+                cboPostalCommLeft.Items.Clear();
                 cboZipLeft.Items.Clear();
                 cboZipRight.Items.Clear();
                 cboUSNG.Items.Clear();
@@ -94,20 +90,23 @@ namespace PushUtransRoadsSGID
                 //update the comboboxes with the currently selected layer's field names
                 for (int i = 0; i < clsGlobals.pGFlayer.FeatureClass.Fields.FieldCount; i++)
                 {
-                    cboAddressQuad.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboAddressSystem.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboAddressQuadRight.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboAddressQuadLeft.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboAddrSysLeft.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboAddrSysRight.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                     cboCityLeft.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                     cboCityRight.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboCounty.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboUspsName.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboCountyRight.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboCountyLeft.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboPostalCommRight.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    cboPostalCommLeft.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                     cboZipLeft.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                     cboZipRight.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                     cboUSNG.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboGrid100K.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboGrid1Mil.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboMidY.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-                    cboMidX.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
-
+                    ////cboGrid100K.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    ////cboGrid1Mil.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    ////cboMidY.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
+                    ////cboMidX.Items.Add(clsGlobals.pGFlayer.FeatureClass.Fields.Field[i].Name.ToString());
                 }
             }
             catch (Exception ex)
@@ -176,7 +175,6 @@ namespace PushUtransRoadsSGID
                 // show the cursor as busy
                 System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
-
                 // get access to the layer that is specified in the choose layer dropdown box
                 clsGlobals.pGFlayer = null;
                 clsGlobals.arcFeatLayer = null;
@@ -212,14 +210,12 @@ namespace PushUtransRoadsSGID
                     return;
                 }
 
-
                 // connect to sgid database
                 clsGlobals.workspaceSGID = clsPushSgidStaticClass.ConnectToTransactionalVersion("", "sde:sqlserver:sgid.agrc.utah.gov", "SGID10", "DBMS", "sde.DEFAULT", "agrc", "agrc");
                 clsGlobals.featureWorkspaceSGID = (IFeatureWorkspace)clsGlobals.workspaceSGID;
 
                 // get access to sgid feature classes for spatial intersects
                 clsPushSgidStaticClass.GetAccessToSgidLayers();
-
 
                 // confirm the user wants to edit that layer's fields on the selected records
                 string strFieldsToBeEdited = "";
@@ -231,13 +227,21 @@ namespace PushUtransRoadsSGID
                 {
                     strFieldsToBeEdited = strFieldsToBeEdited + cboZipLeft.Text.ToString() + ", ";
                 }
-                if (cboCounty.SelectedIndex != -1)
+                if (cboCountyRight.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboCounty.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboCountyRight.Text.ToString() + ", ";
                 }
-                if (cboUspsName.SelectedIndex != -1)
+                if (cboCountyLeft.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboUspsName.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboCountyLeft.Text.ToString() + ", ";
+                }
+                if (cboPostalCommRight.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboPostalCommRight.Text.ToString() + ", ";
+                }
+                if (cboPostalCommLeft.SelectedIndex != -1)
+                {
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboPostalCommLeft.Text.ToString() + ", ";
                 }
                 if (cboCityRight.SelectedIndex != -1)
                 {
@@ -247,34 +251,42 @@ namespace PushUtransRoadsSGID
                 {
                     strFieldsToBeEdited = strFieldsToBeEdited + cboCityLeft.Text.ToString() + ", ";
                 }
-                if (cboAddressSystem.SelectedIndex != -1)
+                if (cboAddrSysLeft.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddressSystem.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddrSysLeft.Text.ToString() + ", ";
                 }
-                if (cboAddressQuad.SelectedIndex != -1)
+                if (cboAddrSysRight.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddressQuad.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddrSysRight.Text.ToString() + ", ";
                 }
-                if (cboGrid100K.SelectedIndex != -1)
+                if (cboAddressQuadRight.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboGrid100K.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddressQuadRight.Text.ToString() + ", ";
                 }
-                if (cboGrid1Mil.SelectedIndex != -1)
+                if (cboAddressQuadLeft.SelectedIndex != -1)
                 {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboGrid1Mil.Text.ToString() + ", ";
+                    strFieldsToBeEdited = strFieldsToBeEdited + cboAddressQuadLeft.Text.ToString() + ", ";
                 }
+                ////if (cboGrid100K.SelectedIndex != -1)
+                ////{
+                ////    strFieldsToBeEdited = strFieldsToBeEdited + cboGrid100K.Text.ToString() + ", ";
+                ////}
+                ////if (cboGrid1Mil.SelectedIndex != -1)
+                ////{
+                ////    strFieldsToBeEdited = strFieldsToBeEdited + cboGrid1Mil.Text.ToString() + ", ";
+                ////}
                 if (cboUSNG.SelectedIndex != -1)
                 {
                     strFieldsToBeEdited = strFieldsToBeEdited + cboUSNG.Text.ToString() + ", ";
                 }
-                if (cboMidX.SelectedIndex != -1)
-                {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboMidX.Text.ToString() + ", ";
-                }
-                if (cboMidY.SelectedIndex != -1)
-                {
-                    strFieldsToBeEdited = strFieldsToBeEdited + cboMidY.Text.ToString() + ", ";
-                }
+                ////if (cboMidX.SelectedIndex != -1)
+                ////{
+                ////    strFieldsToBeEdited = strFieldsToBeEdited + cboMidX.Text.ToString() + ", ";
+                ////}
+                ////if (cboMidY.SelectedIndex != -1)
+                ////{
+                ////    strFieldsToBeEdited = strFieldsToBeEdited + cboMidY.Text.ToString() + ", ";
+                ////}
 
                 //remove the last two chararcters -- ie: ', '
                 strFieldsToBeEdited = strFieldsToBeEdited.Remove(strFieldsToBeEdited.Length - 2);
@@ -296,25 +308,58 @@ namespace PushUtransRoadsSGID
 
                         // assign values to user choosen fields
 
-                        //get the feature's geometry
+                        // get the feature's geometry
                         IGeometry arcEdit_geometry = clsGlobals.arcFeatureToEditSpatial.ShapeCopy;
                         IPolyline arcEdit_polyline = null;
+
+                        // midpoint variable for UniqueID (use this for non right/left fields)
                         IPoint arcEdit_midPoint = null;
 
+                        // right/left offset point variables
+                        IConstructPoint arcConstructionPoint_posRight;
+                        IConstructPoint arcConstructionPoint_negLeft;
+                        IPoint outPoint_posRight = null;
+                        IPoint outPoint_negLeft = null;
+
                         // check the geometry type (if polyline or point then proceed)
+                        // POLYGON FEATURE CLASS //
                         if (arcEdit_geometry.GeometryType == esriGeometryType.esriGeometryPolyline)
                         {
                             //get the midpoint of the line segment for doing spatial queries (intersects)
                             arcEdit_polyline = arcEdit_geometry as IPolyline;
-                            arcEdit_midPoint = new ESRI.ArcGIS.Geometry.Point();
 
-                            //get the midpoint of the line, pass it into a point
-                            arcEdit_polyline.QueryPoint(esriSegmentExtension.esriNoExtension, 0.5, true, arcEdit_midPoint);
+                            // check if we need to get the midpoint of the line - if assigning non right/left field values
+                            if (cboUSNG.SelectedIndex != -1)
+                            {
+                                //get the midpoint of the line, pass it into a point
+                                arcEdit_midPoint = new ESRI.ArcGIS.Geometry.Point();
+                                arcEdit_polyline.QueryPoint(esriSegmentExtension.esriNoExtension, 0.5, true, arcEdit_midPoint);
+                            }
 
+                            // check to see if we're doing a right/left spatial search...
+                            if (cboCityLeft.SelectedIndex != -1 || cboCityRight.SelectedIndex != -1 || cboZipLeft.SelectedIndex != -1 || cboZipRight.SelectedIndex != -1 || cboAddrSysLeft.SelectedIndex != -1 || cboAddrSysRight.SelectedIndex != -1 || cboCountyLeft.SelectedIndex != -1 || cboCountyRight.SelectedIndex != -1 || cboPostalCommLeft.SelectedIndex != -1 || cboPostalCommRight.SelectedIndex != -1 || cboAddressQuadLeft.SelectedIndex != -1 || cboAddressQuadRight.SelectedIndex != -1)
+                            {
+                                // the user has chosen at least one of the left/right fields, so create the offset points for them
+                                // test the iconstructpoint.constructtooffset mehtod
+                                arcConstructionPoint_posRight = new ESRI.ArcGIS.Geometry.PointClass();
+                                arcConstructionPoint_negLeft = new ESRI.ArcGIS.Geometry.PointClass();
+
+                                // call offset mehtod to get a point along the curve's midpoint - offsetting in the postive position (esri documentation states that positive offset will always return point on the right side of the curve)
+                                arcConstructionPoint_posRight.ConstructOffset(arcEdit_polyline, esriSegmentExtension.esriNoExtension, 0.5, true, 15);  // 10 meters is about 33 feet (15 is about 50 feet)
+                                outPoint_posRight = arcConstructionPoint_posRight as IPoint;
+                                //MessageBox.Show("for positive/right offset: " + outPoint_posRight.X + " , " + outPoint_posRight.Y);
+
+                                // call offset mehtod to get a point along the curve's midpoint - offsetting in the negative position (esri documentation states that negative offset will always return point on the left-side of curve)
+                                arcConstructionPoint_negLeft.ConstructOffset(arcEdit_polyline, esriSegmentExtension.esriNoExtension, 0.5, true, -15);  // -10 meters is about -33 feet (15 is about 50 feet)
+                                outPoint_negLeft = arcConstructionPoint_negLeft as IPoint;
+                                // MessageBox.Show("for negative/left offset: " + outPoint_negLeft.X + " , " + outPoint_negLeft.Y);
+                            }
                         }
+                        // POINT FEATURE CLASS //
                         else if (arcEdit_geometry.GeometryType == esriGeometryType.esriGeometryPoint)
                         {
                             arcEdit_midPoint = (IPoint)arcEdit_geometry;
+                            // MessageBox.Show("You have chosed a point feature class. Based on this geometry type, you limited to spatially assigning USNG_UniqueID values only.", "Point Feature Class", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
@@ -322,35 +367,10 @@ namespace PushUtransRoadsSGID
                             return;
                         }
 
-                        //MessageBox.Show(arcEdit_midPoint.X.ToString() + " " + arcEdit_midPoint.Y.ToString(), "UTM X, Y", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        // check to see if we're doing a right/left spatial search...
-                        IConstructPoint arcConstructionPoint_posRight;
-                        IConstructPoint arcConstructionPoint_negLeft;
-                        IPoint outPoint_posRight = null;
-                        IPoint outPoint_negLeft = null;
-                        if (cboCityLeft.SelectedIndex != -1 | cboCityRight.SelectedIndex != -1 | cboZipLeft.SelectedIndex != -1 | cboZipRight.SelectedIndex != -1)
-                        {
-                            // the user has chosen at least one of the left/right fields, so create the offset points for them
-                            // test the iconstructpoint.constructtooffset mehtod
-                            arcConstructionPoint_posRight = new ESRI.ArcGIS.Geometry.PointClass();
-                            arcConstructionPoint_negLeft = new ESRI.ArcGIS.Geometry.PointClass();
+                        //// ASSIGN FIELD VALUES VIA SPATIAL INTERSECT ////
 
-                            // call offset mehtod to get a point along the curve's midpoint - offsetting in the postive position (esri documentation states that positive offset will always return point on the right side of the curve)
-                            arcConstructionPoint_posRight.ConstructOffset(arcEdit_polyline, esriSegmentExtension.esriNoExtension, 0.5, true, 15);  // 10 meters is about 33 feet (15 is about 50 feet)
-                            outPoint_posRight = arcConstructionPoint_posRight as IPoint;
-                            //MessageBox.Show("for positive/right offset: " + outPoint_posRight.X + " , " + outPoint_posRight.Y);
-
-                            // call offset mehtod to get a point along the curve's midpoint - offsetting in the negative position (esri documentation states that negative offset will always return point on the left-side of curve)
-                            arcConstructionPoint_negLeft.ConstructOffset(arcEdit_polyline, esriSegmentExtension.esriNoExtension, 0.5, true, -15);  // -10 meters is about -33 feet (15 is about 50 feet)
-                            outPoint_negLeft = arcConstructionPoint_negLeft as IPoint;
-                            //MessageBox.Show("for negative/left offset: " + outPoint_negLeft.X + " , " + outPoint_negLeft.Y);
-
-
-                        }
-
-
-                        // do a spatial intersect for the user selected fields 
+                        // ZIPCODE RIGHT //
                         if (cboZipRight.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
@@ -362,10 +382,9 @@ namespace PushUtransRoadsSGID
 
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboZipRight.Text), strZipRight);
                             }
-                            else
-                            {
-                            }
                         }
+
+                        // ZIPCODE LEFT //
                         if (cboZipLeft.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
@@ -377,40 +396,65 @@ namespace PushUtransRoadsSGID
 
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboZipLeft.Text), strZipLeft);
                             }
-                            else
-                            {
-                            }
                         }
-                        if (cboCounty.SelectedIndex != -1)
+
+                        // COUNTY LEFT //
+                        if (cboCountyLeft.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
-                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_Counties);
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_negLeft, clsGlobals.arcFeatClass_Counties);
 
                             if (arcFeatureIntersected != null)
                             {
                                 string strCofips = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("FIPS_STR")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCounty.Text), strCofips);
-                            }
-                            else
-                            {
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCountyLeft.Text), strCofips);
                             }
                         }
-                        if (cboUspsName.SelectedIndex != -1)
+
+                        // COUNTY RIGHT //
+                        if (cboCountyRight.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
-                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_ZipCodes);
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_posRight, clsGlobals.arcFeatClass_Counties);
+
+                            if (arcFeatureIntersected != null)
+                            {
+                                string strCofips = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("FIPS_STR")).ToString().Trim();
+
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCountyRight.Text), strCofips);
+                            }
+                        }
+
+                        // POSTAL COMMUNITY LEFT //
+                        if (cboPostalCommLeft.SelectedIndex != -1)
+                        {
+                            // get the intersected boundaries value
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_negLeft, clsGlobals.arcFeatClass_ZipCodes);
 
                             if (arcFeatureIntersected != null)
                             {
                                 string strUspsName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("NAME")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboUspsName.Text), strUspsName);
-                            }
-                            else
-                            {
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboPostalCommLeft.Text), strUspsName);
                             }
                         }
+
+                        // POSTAL COMMUNITY RIGHT //
+                        if (cboPostalCommRight.SelectedIndex != -1)
+                        {
+                            // get the intersected boundaries value
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_posRight, clsGlobals.arcFeatClass_ZipCodes);
+
+                            if (arcFeatureIntersected != null)
+                            {
+                                string strUspsName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("NAME")).ToString().Trim();
+
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboPostalCommRight.Text), strUspsName);
+                            }
+                        }
+
+                        // INC MUNI RIGHT //
                         if (cboCityRight.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
@@ -422,10 +466,9 @@ namespace PushUtransRoadsSGID
 
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCityRight.Text), strCityRight.ToUpper());
                             }
-                            else
-                            {
-                            }
                         }
+
+                        // INC MUNI LEFT //
                         if (cboCityLeft.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
@@ -437,48 +480,41 @@ namespace PushUtransRoadsSGID
 
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCityLeft.Text), strCityLeft.ToUpper());
                             }
-                            else
-                            {
-                            }
                         }
-                        if (cboAddressSystem.SelectedIndex != -1 & cboAddressQuad.SelectedIndex != -1) // user wants to populate both grid_name and quadrant 
+
+                        // ADDRESS SYSTEM AND/OR QUADRANT LEFT //
+                        if (cboAddrSysLeft.SelectedIndex != -1 & cboAddressQuadLeft.SelectedIndex != -1) // user wants to populate both left grid_name and quadrant 
                         {
                             // get the intersected boundaries value
-                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_AddrSys);
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_negLeft, clsGlobals.arcFeatClass_AddrSys);
 
                             if (arcFeatureIntersected != null)
                             {
                                 string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressSystem.Text), strGridName);
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuad.Text), strQuad);
-                            }
-                            else
-                            {
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysLeft.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadLeft.Text), strQuad);
                             }
                         }
-                        if (cboAddressSystem.SelectedIndex != -1 & cboAddressQuad.SelectedIndex == -1) // user wants to populate both grid_name and quadrant 
+                        if (cboAddrSysLeft.SelectedIndex != -1 & cboAddressQuadLeft.SelectedIndex == -1) // user wants to only populate left grid_name 
                         {
                             // get the intersected boundaries value
-                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_AddrSys);
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_negLeft, clsGlobals.arcFeatClass_AddrSys);
 
                             if (arcFeatureIntersected != null)
                             {
                                 string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 //string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressSystem.Text), strGridName);
-                                //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuad.Text), strQuad);
-                            }
-                            else
-                            {
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysLeft.Text), strGridName);
+                                //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadLeft.Text), strQuad);
                             }
                         }
-                        if (cboAddressSystem.SelectedIndex == -1 & cboAddressQuad.SelectedIndex != -1) // user wants to populate both grid_name and quadrant 
+                        if (cboAddrSysLeft.SelectedIndex == -1 & cboAddressQuadLeft.SelectedIndex != -1) // user wants to only populate left quadrant 
                         {
                             // get the intersected boundaries value
-                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_AddrSys);
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_negLeft, clsGlobals.arcFeatClass_AddrSys);
 
                             if (arcFeatureIntersected != null)
                             {
@@ -486,13 +522,55 @@ namespace PushUtransRoadsSGID
                                 string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
                                 //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressSystem.Text), strGridName);
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuad.Text), strQuad);
-                            }
-                            else
-                            {
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadLeft.Text), strQuad);
                             }
                         }
-                        // unique_id field
+
+                        // ADDRESS SYSTEM AND/OR QUADRANT RIGHT //
+                        if (cboAddrSysRight.SelectedIndex != -1 & cboAddressQuadRight.SelectedIndex != -1) // user wants to populate both right grid_name and quadrant 
+                        {
+                            // get the intersected boundaries value
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_posRight, clsGlobals.arcFeatClass_AddrSys);
+
+                            if (arcFeatureIntersected != null)
+                            {
+                                string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
+
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysRight.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadRight.Text), strQuad);
+                            }
+                        }
+                        if (cboAddrSysRight.SelectedIndex != -1 & cboAddressQuadRight.SelectedIndex == -1) // user wants to only populate right grid_name 
+                        {
+                            // get the intersected boundaries value
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_posRight, clsGlobals.arcFeatClass_AddrSys);
+
+                            if (arcFeatureIntersected != null)
+                            {
+                                string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                //string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
+
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysRight.Text), strGridName);
+                                //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadRight.Text), strQuad);
+                            }
+                        }
+                        if (cboAddrSysRight.SelectedIndex == -1 & cboAddressQuadRight.SelectedIndex != -1) // user wants to only populate right quadrant 
+                        {
+                            // get the intersected boundaries value
+                            IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(outPoint_posRight, clsGlobals.arcFeatClass_AddrSys);
+
+                            if (arcFeatureIntersected != null)
+                            {
+                                //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
+
+                                //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressSystem.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadRight.Text), strQuad);
+                            }
+                        }
+
+                        // UNIQUE_ID //
                         if (cboUSNG.SelectedIndex != -1)
                         {
                             // get the intersected boundaries value
@@ -546,13 +624,12 @@ namespace PushUtransRoadsSGID
                                 long lngMeterX = (long)dblMeterX;
                                 long lngMeterY = (long)dblMeterY;
 
-
-                                // check if it's a utrans/road schema polyline >>> having streetname, streettype, or sufdir fields
-                                if (cboChooseLayer.Text.Contains("Roads") | cboChooseLayer.Text.Contains("StatewideStreets"))
+                                // check if it's a utrans/sgid road schema polyline >>> having NAME, POSTTYPE, or POSTDIR fields
+                                if (cboChooseLayer.Text.Contains("Roads") | cboChooseLayer.Text.Contains("Roads_Edit"))
                                 {
-                                    string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
-                                    string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
-                                    string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
+                                    string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("NAME")).ToString().Trim();
+                                    string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("POSTTYPE")).ToString().Trim();
+                                    string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("POSTDIR")).ToString().Trim();
 
                                     // check if the utrans road is numberic or integer
                                     int intStreetNameIsNum;
@@ -595,10 +672,60 @@ namespace PushUtransRoadsSGID
                                             strFullName = "";
                                         }
                                     }
-                                    // end of check if utrans/roads segment
                                 }
 
+                                // if SGID AddressPoints-based schema, having StreetName, StreetType, and SuffixDir fields
+                                if (cboChooseLayer.Text.Contains("AddressPoints"))
+                                {
+                                    string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("StreetName")).ToString().Trim();
+                                    string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("StreetType")).ToString().Trim();
+                                    string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SuffixDir")).ToString().Trim();
 
+                                    // check if the utrans road is numberic or integer
+                                    int intStreetNameIsNum;
+                                    bool blnIsNumbericStreetName = int.TryParse(strStreetName, out intStreetNameIsNum);
+
+                                    if (blnIsNumbericStreetName)
+                                    {
+                                        if (strStreetName != "")
+                                        {
+                                            if (strStreetType != "")
+                                            {
+                                                strFullName = "_" + strStreetName + "_" + strSufDir;
+                                            }
+                                            else
+                                            {
+                                                strFullName = "_" + strStreetName;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            strFullName = "";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // concatinate the streetname and streettype
+                                        if (strStreetName != "")
+                                        {
+                                            if (strStreetType != "")
+                                            {
+                                                strFullName = "_" + strStreetName + "_" + strStreetType;
+                                            }
+                                            else
+                                            {
+                                                strFullName = "_" + strStreetName;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            strFullName = "";
+                                        }
+                                    }
+                                }
+
+                                // replace spaces with underscores (for cases where the street name is two words.  Ex: BIG CANYON ==> BIG_CANYON)
+                                strFullName = strFullName.Replace(" ", "_");
 
                                 // trim the x and y meter values to get the needed four characters from each value
                                 string strMeterX_NoDecimal = lngMeterX.ToString();
@@ -616,68 +743,65 @@ namespace PushUtransRoadsSGID
                                 strUSNG_UniqueID = strGrid1Mil + strGrid100k + strMeterX_NoDecimal + strMeterY_NoDecimal + strFullName;
 
                                 //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressSystem.Text), strGridName);
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboUSNG.Text), strUSNG_UniqueID);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboUSNG.Text), strUSNG_UniqueID.Trim());
 
-                                // check if user wants to populate the usng grid fields as well
-                                if (cboGrid100K.SelectedIndex != -1)
-                                {
-                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid100K.Text), strGrid100k);
-                                }
-                                if (cboGrid1Mil.SelectedIndex != -1)
-                                {
-                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid1Mil.Text), strGrid1Mil);
-                                }
-                            }
-                            else
-                            {
+                                ////// check if user wants to populate the usng grid fields as well
+                                ////if (cboGrid100K.SelectedIndex != -1)
+                                ////{
+                                ////    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid100K.Text), strGrid100k);
+                                ////}
+                                ////if (cboGrid1Mil.SelectedIndex != -1)
+                                ////{
+                                ////    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid1Mil.Text), strGrid1Mil);
+                                ////}
                             }
                         }
 
-                        // if the user only wants to populate the usng grid fields, and not the unique_id field, then... 
-                        if (cboUSNG.SelectedIndex == -1 & (cboGrid100K.SelectedIndex != -1 | cboGrid1Mil.SelectedIndex != -1))
-                        {
-                            if (cboGrid100K.SelectedIndex != -1)
-                            {
-                                // get the intersected boundaries value
-                                IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_USNG);
+                        ////// if the user only wants to populate the usng grid fields, and not the unique_id field, then... 
+                        ////if (cboUSNG.SelectedIndex == -1 & (cboGrid100K.SelectedIndex != -1 | cboGrid1Mil.SelectedIndex != -1))
+                        ////{
+                        ////    if (cboGrid100K.SelectedIndex != -1)
+                        ////    {
+                        ////        // get the intersected boundaries value
+                        ////        IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_USNG);
 
-                                if (arcFeatureIntersected != null)
-                                {
-                                    //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
-                                    //string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
-                                    string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
+                        ////        if (arcFeatureIntersected != null)
+                        ////        {
+                        ////            //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                        ////            //string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
+                        ////            string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
 
-                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid100K.Text), strGrid100k);
-                                }
-                            }
+                        ////            clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid100K.Text), strGrid100k);
+                        ////        }
+                        ////    }
                                 
-                            if (cboGrid1Mil.SelectedIndex != -1)
-                            {
-                                // get the intersected boundaries value
-                                IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_USNG);
+                        ////    if (cboGrid1Mil.SelectedIndex != -1)
+                        ////    {
+                        ////        // get the intersected boundaries value
+                        ////        IFeature arcFeatureIntersected = clsPushSgidStaticClass.GetIntersectedSGIDBoundary(arcEdit_midPoint, clsGlobals.arcFeatClass_USNG);
 
-                                if (arcFeatureIntersected != null)
-                                {
-                                    //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
-                                    string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
-                                    //string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
+                        ////        if (arcFeatureIntersected != null)
+                        ////        {
+                        ////            //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                        ////            string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
+                        ////            //string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
 
-                                    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid1Mil.Text), strGrid1Mil);
-                                }
-                            }
-                        }
+                        ////            clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboGrid1Mil.Text), strGrid1Mil);
+                        ////        }
+                        ////    }
+                        ////}
 
-                        // MidX field
-                        if (cboMidX.SelectedIndex != -1)
-                        {
-                            clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboMidX.Text), arcEdit_midPoint.X.ToString());
-                        }
+                        ////// MidX field
+                        ////if (cboMidX.SelectedIndex != -1)
+                        ////{
+                        ////    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboMidX.Text), arcEdit_midPoint.X.ToString());
+                        ////}
 
-                        // MidY field
-                        if (cboMidY.SelectedIndex != -1)
-                        {
-                            clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboMidY.Text), arcEdit_midPoint.Y.ToString());
-                        }
+                        ////// MidY field
+                        ////if (cboMidY.SelectedIndex != -1)
+                        ////{
+                        ////    clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboMidY.Text), arcEdit_midPoint.Y.ToString());
+                        ////}
 
                         clsGlobals.arcFeatureToEditSpatial.Store();
                         clsGlobals.arcEditor.StopOperation("AssignSpatialAttributes");
@@ -700,5 +824,7 @@ namespace PushUtransRoadsSGID
                 clsGlobals.arcEditor.StopOperation("AssignSpatialAttributes");
             }
         }
+
+
     }
 }
