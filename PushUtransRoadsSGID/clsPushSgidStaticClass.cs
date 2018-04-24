@@ -83,8 +83,6 @@ namespace PushUtransRoadsSGID
                 "Push Utrans Roads to SGID!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return null;
             }
-
-            
         }
 
 

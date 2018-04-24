@@ -76,6 +76,7 @@ namespace PushUtransRoadsSGID
             AddItem("{e7dab9b0-789d-4027-9634-fa3b85365802}"); // address range checks
             AddItem("{49b2f554-ba62-4768-aed8-e8b51b48dc51}"); // assign attributes spatially
             AddItem("{c69b83f0-0d8d-4e36-8a95-86935303eaf8}"); // add the remove duplicate vertices button
+            AddItem("{47ae1b25-8a26-4dbb-adbf-21fbabeffa30}"); // add the assign milepost button to the toolbar
         }
 
         public override string Caption

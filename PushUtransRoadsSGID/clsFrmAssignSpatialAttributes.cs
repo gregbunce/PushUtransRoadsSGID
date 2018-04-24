@@ -581,9 +581,6 @@ namespace PushUtransRoadsSGID
                                 //string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
                                 string strGrid1Mil = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID1MIL")).ToString().Trim();
                                 string strGrid100k = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID100K")).ToString().Trim();
-                                //string strStreetName = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETNAME")).ToString().Trim();
-                                //string strStreetType = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("STREETTYPE")).ToString().Trim();
-                                //string strSufDir = clsGlobals.arcFeatureToEditSpatial.get_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField("SUFDIR")).ToString().Trim();
 
                                 string strGrid1Mil_UTMZone = strGrid1Mil.Substring(0, 2);
                                 string strFullName = "";
@@ -824,7 +821,5 @@ namespace PushUtransRoadsSGID
                 clsGlobals.arcEditor.StopOperation("AssignSpatialAttributes");
             }
         }
-
-
     }
 }

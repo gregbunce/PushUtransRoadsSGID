@@ -63,6 +63,16 @@ namespace PushUtransRoadsSGID.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AnimationMoveLayerAlongPath16 {
+            get {
+                object obj = ResourceManager.GetObject("AnimationMoveLayerAlongPath16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap CatalogThumbnailCreate_B_16 {
             get {
                 object obj = ResourceManager.GetObject("CatalogThumbnailCreate_B_16", resourceCulture);

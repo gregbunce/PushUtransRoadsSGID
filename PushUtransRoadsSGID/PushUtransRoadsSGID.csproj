@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsBtnAddressRanges.cs" />
+    <Compile Include="clsBtnAssignMileposts.cs" />
     <Compile Include="clsBtnAssignSpatialAttributes.cs" />
     <Compile Include="clsBtnMakeNullEmtpyString.cs" />
     <Compile Include="clsBtnUtransRoadsSGID.cs" />
@@ -148,7 +149,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="clsBtnUtransRoadsSGID.bmp" />
     <EmbeddedResource Include="clsFrmAddressRanges.resx">
       <DependentUpon>clsFrmAddressRanges.cs</DependentUpon>
     </EmbeddedResource>
@@ -167,9 +167,6 @@
     <None Include="Resources\TableFields16.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="clsBtnAddressRanges.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Group_C_16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +174,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TmCompareSelectedFeatures16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationMoveLayerAlongPath16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
