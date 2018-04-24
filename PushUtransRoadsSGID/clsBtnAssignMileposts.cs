@@ -195,6 +195,7 @@ namespace PushUtransRoadsSGID
                 clsGlobals.arcEditor.StopOperation("Null MP Values");
 
 
+
                 //// ASSIGN THE MILEPOST VALUES ////
                 double searchOutDist = 15;
                 queryFilter = new QueryFilter();
@@ -213,21 +214,22 @@ namespace PushUtransRoadsSGID
                 while ((arcFeature_Roads = arcFeatureCursor.NextFeature()) != null)
                 {
                     // get the route name from roads
-                    string roadsRouteName = arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_RTNAME")).ToString();
-                    double roads_FromMile;
-                    double roads_ToMile;
+                    var roadsRouteName = arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_RTNAME"));
+                    
+                    ////double roads_FromMile;
+                    ////double roads_ToMile;
 
-                    // get the from mile value from roads
-                    if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")).ToString() != "")
-                    {
-                        roads_FromMile = Convert.ToDouble(arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")));
-                    }
+                    ////// get the from mile value from roads
+                    ////if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")).ToString() != "")
+                    ////{
+                    ////    roads_FromMile = Convert.ToDouble(arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")));
+                    ////}
 
-                    // get the to mile value from roads
-                    if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")).ToString() != "")
-                    {
-                        roads_ToMile = Convert.ToDouble(arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")));
-                    }
+                    ////// get the to mile value from roads
+                    ////if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")).ToString() != "")
+                    ////{
+                    ////    roads_ToMile = Convert.ToDouble(arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")));
+                    ////}
 
                     // Set up query filter and feature cursor for LRS layer.
                     IQueryFilter queryFilter_LRS = new QueryFilter();
@@ -291,24 +293,25 @@ namespace PushUtransRoadsSGID
                         }
 
 
+
                         // END (TO) POINT //
-                        polyline_Roads = (IPolyline)arcFeature_Roads.Shape;
-                        polyline_LRS = (IPolyline)arcFeature_LRS.Shape;
+                        ////polyline_Roads = (IPolyline)arcFeature_Roads.Shape;
+                        ////polyline_LRS = (IPolyline)arcFeature_LRS.Shape;
                         IPoint toPoint_Roads = polyline_Roads.ToPoint;
 
                         dist = 0;
                         partIndex = 0;
                         segIndex = 0;
                         right = false;
-                        hitStart = false;
+                        hitEnd = false;
 
                         point_Hit = new ESRI.ArcGIS.Geometry.Point();
                         hitTest = (IHitTest)polyline_LRS;
 
                         // Hit test to see if a vertex is hit.
-                        hitStart = hitTest.HitTest(toPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartVertex, point_Hit, dist, ref partIndex, ref segIndex, right);
+                        hitEnd = hitTest.HitTest(toPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartVertex, point_Hit, dist, ref partIndex, ref segIndex, right);
 
-                        if (hitStart)
+                        if (hitEnd)
                         {
                             if (toPoint_Roads.M >= 0)
                             {
@@ -322,9 +325,9 @@ namespace PushUtransRoadsSGID
                         {
                             // if no vertex to vertex hit, then interpolate along route segment.
                             // hit test to see if polyline is hit anywhere, not necessarily at vertex
-                            hitStart = hitTest.HitTest(toPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartBoundary, point_Hit, dist, ref partIndex, ref segIndex, right);
+                            hitEnd = hitTest.HitTest(toPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartBoundary, point_Hit, dist, ref partIndex, ref segIndex, right);
 
-                            if (hitStart)
+                            if (hitEnd)
                             {
                                 IGeometryCollection geometryCollection = (IGeometryCollection)polyline_LRS;
                                 ISegmentCollection segmentCollection = (ISegmentCollection)geometryCollection.Geometry[partIndex];
@@ -346,7 +349,7 @@ namespace PushUtransRoadsSGID
                     }
 
                     // store edit
-                    if (hitStart | hitEnd)
+                    if (hitStart || hitEnd)
                     {
                         arcFeature_Roads.Store();
                     }
