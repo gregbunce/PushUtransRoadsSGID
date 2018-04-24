@@ -132,7 +132,6 @@ namespace PushUtransRoadsSGID
                     return;
                 }
 
-
                 // Get access to the needed layers (UTRANS Roads and LRS layers)
                 // make sure the user has selected a layer in the toc
                 if (clsGlobals.pMxDocument.SelectedLayer == null)
@@ -169,41 +168,199 @@ namespace PushUtransRoadsSGID
                     return;
                 }
 
-                // Null out the existing from/to milepost values so we can track the new ones.
+                //// NULL OUT the existing from/to milepost values so we can track the new ones. ////
                 clsGlobals.arcEditor.StartOperation();
 
                 // Null out the existing DOT_F_MILE and DOT_T_MILE values
                 IQueryFilter queryFilter = new QueryFilter();
                 queryFilter.WhereClause = "DOT_F_MILE >= 0 or DOT_T_MILE >= 0";
-                IFeatureCursor featureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
+                IFeatureCursor arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
                 IFeature arcFeature;
-                while ((arcFeature = featureCursor.NextFeature()) != null)
+
+                while ((arcFeature = arcFeatureCursor.NextFeature()) != null)
                 {
                     arcFeature.set_Value(arcFeature.Fields.FindField("DOT_F_MILE"), DBNull.Value);
                     arcFeature.set_Value(arcFeature.Fields.FindField("DOT_T_MILE"), DBNull.Value);
+
+                    // store edit
                     arcFeature.Store();
                 }
 
                 // null out variables
                 queryFilter = null;
-                featureCursor = null;
+                arcFeatureCursor = null;
                 arcFeature = null;
 
-                //// Null out the existing DOT_T_MILE values
-                //queryFilter = new QueryFilter();
-                //queryFilter.WhereClause = "DOT_T_MILE >= 0";
-                //featureCursor = featureLayerLRS.FeatureClass.Search(queryFilter, false);
-                //while ((arcFeature = featureCursor.NextFeature()) != null)
-                //{
-                //    arcFeature.set_Value(arcFeature.Fields.FindField("DOT_T_MILE"), null);
-                //}
-                //// null out variables
-                //queryFilter = null;
-                //featureCursor = null;
-                //arcFeature = null;
-
+                // Stop Edit Operation.
                 clsGlobals.arcEditor.StopOperation("Null MP Values");
 
+
+                //// ASSIGN THE MILEPOST VALUES ////
+                double searchOutDist = 15;
+                queryFilter = new QueryFilter();
+                // queryFilter.WhereClause = "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')"; // sde
+                queryFilter.WhereClause = "CHAR_LENGTH(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')";  // .gdb
+                //queryFilter.WhereClause = "(not DOT_RTNAME is null) and char_length (DOT_RTNAME)= 5"; // .shp
+
+                arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
+                IFeature arcFeature_Roads;
+                bool hitStart = false;
+                bool hitEnd = false;
+
+                // Start edit operation
+                clsGlobals.arcEditor.StartOperation();
+
+                while ((arcFeature_Roads = arcFeatureCursor.NextFeature()) != null)
+                {
+                    // get the route name from roads
+                    string roadsRouteName = arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_RTNAME")).ToString();
+                    double roads_FromMile;
+                    double roads_ToMile;
+
+                    // get the from mile value from roads
+                    if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")).ToString() != "")
+                    {
+                        roads_FromMile = Convert.ToDouble(arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")));
+                    }
+
+                    // get the to mile value from roads
+                    if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")).ToString() != "")
+                    {
+                        roads_ToMile = Convert.ToDouble(arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE")));
+                    }
+
+                    // Set up query filter and feature cursor for LRS layer.
+                    IQueryFilter queryFilter_LRS = new QueryFilter();
+                    queryFilter_LRS.WhereClause = "LABEL = '" + roadsRouteName + "'";
+                    IFeatureCursor arcFeatureCursor_LRS = featureLayerLRS.FeatureClass.Search(queryFilter_LRS, false);
+                    IFeature arcFeature_LRS = arcFeatureCursor_LRS.NextFeature();
+
+                    if (arcFeature_LRS != null)
+                    {
+                        // START (FROM) POINT //
+                        IPolyline polyline_Roads = (IPolyline)arcFeature_Roads.Shape;
+                        IPolyline polyline_LRS = (IPolyline)arcFeature_LRS.Shape;
+                        IPoint fromPoint_Roads = polyline_Roads.FromPoint;
+
+                        double dist = 0;
+                        int partIndex = 0;
+                        int segIndex = 0;
+                        bool right = false;
+                        hitStart = false;
+
+                        IPoint point_Hit = new ESRI.ArcGIS.Geometry.Point();
+                        IHitTest hitTest = (IHitTest)polyline_LRS;
+
+                        // Hit test to see if a vertex is hit.
+                        hitStart = hitTest.HitTest(fromPoint_Roads,searchOutDist,esriGeometryHitPartType.esriGeometryPartVertex, point_Hit, dist, ref partIndex, ref segIndex, right);
+
+                        if (hitStart)
+                        {
+                            if (fromPoint_Roads.M >= 0)
+                            {
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((fromPoint_Roads.M * 1000) / 1000));
+                            }
+                            else
+                            {
+                            }
+                        }
+                        else
+                        {
+                            // if no vertex to vertex hit, then interpolate along route segment.
+                            // hit test to see if polyline is hit anywhere, not necessarily at vertex
+                            hitStart = hitTest.HitTest(fromPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartBoundary, point_Hit, dist, ref partIndex, ref segIndex, right);
+
+                            if (hitStart)
+                            {
+                                IGeometryCollection geometryCollection = (IGeometryCollection)polyline_LRS;
+                                ISegmentCollection segmentCollection = (ISegmentCollection)geometryCollection.Geometry[partIndex];
+                                ISegment segment = segmentCollection.Segment[segIndex];
+                                ESRI.ArcGIS.Geometry.Point outPoint = new ESRI.ArcGIS.Geometry.Point();
+                                double outDist = 0;
+                                double awayDist = 0;
+                                double mcoord = 0;
+
+                                // interpolate
+                                segment.QueryPointAndDistance(esriSegmentExtension.esriNoExtension, fromPoint_Roads, true, outPoint, outDist, awayDist, true);
+                                mcoord = segment.FromPoint.M + ((segment.ToPoint.M - segment.FromPoint.M) * outDist);
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((mcoord * 1000) / 1000) + 0.001);
+                            }
+                            else
+                            {
+                            }
+                        }
+
+
+                        // END (TO) POINT //
+                        polyline_Roads = (IPolyline)arcFeature_Roads.Shape;
+                        polyline_LRS = (IPolyline)arcFeature_LRS.Shape;
+                        IPoint toPoint_Roads = polyline_Roads.ToPoint;
+
+                        dist = 0;
+                        partIndex = 0;
+                        segIndex = 0;
+                        right = false;
+                        hitStart = false;
+
+                        point_Hit = new ESRI.ArcGIS.Geometry.Point();
+                        hitTest = (IHitTest)polyline_LRS;
+
+                        // Hit test to see if a vertex is hit.
+                        hitStart = hitTest.HitTest(toPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartVertex, point_Hit, dist, ref partIndex, ref segIndex, right);
+
+                        if (hitStart)
+                        {
+                            if (toPoint_Roads.M >= 0)
+                            {
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((toPoint_Roads.M * 1000) / 1000));
+                            }
+                            else
+                            {
+                            }
+                        }
+                        else
+                        {
+                            // if no vertex to vertex hit, then interpolate along route segment.
+                            // hit test to see if polyline is hit anywhere, not necessarily at vertex
+                            hitStart = hitTest.HitTest(toPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartBoundary, point_Hit, dist, ref partIndex, ref segIndex, right);
+
+                            if (hitStart)
+                            {
+                                IGeometryCollection geometryCollection = (IGeometryCollection)polyline_LRS;
+                                ISegmentCollection segmentCollection = (ISegmentCollection)geometryCollection.Geometry[partIndex];
+                                ISegment segment = segmentCollection.Segment[segIndex];
+                                ESRI.ArcGIS.Geometry.Point outPoint = new ESRI.ArcGIS.Geometry.Point();
+                                double outDist = 0;
+                                double awayDist = 0;
+                                double mcoord = 0;
+
+                                // interpolate
+                                segment.QueryPointAndDistance(esriSegmentExtension.esriNoExtension, toPoint_Roads, true, outPoint, outDist, awayDist, true);
+                                mcoord = segment.FromPoint.M + ((segment.ToPoint.M - segment.FromPoint.M) * outDist);
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((mcoord * 1000) / 1000));
+                            }
+                            else
+                            {
+                            }
+                        }
+                    }
+
+                    // store edit
+                    if (hitStart | hitEnd)
+                    {
+                        arcFeature_Roads.Store();
+                    }
+
+                    // null out variables
+                    queryFilter_LRS = null;
+                    arcFeatureCursor_LRS = null;
+                    arcFeature_Roads = null;
+                }
+
+                // Stop Edit Operation.
+                clsGlobals.arcEditor.StopOperation("Assign MP Values");
+
+                // Done! //
                 MessageBox.Show("Done updating assigning milepost values from SGID LRS Layer.  Don't forget to SAVE edits!", "Done!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             catch (Exception ex)
@@ -213,9 +370,6 @@ namespace PushUtransRoadsSGID
                 "Error Location:" + Environment.NewLine + ex.StackTrace,
                 "clsBtnAssignMilepost: ", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-
-
-
         }
 
         #endregion
