@@ -117,6 +117,9 @@ namespace PushUtransRoadsSGID
         {
             try
             {
+                // count how many mileposts were assigned.
+                int assignedCounter = 0;
+
                 // show the cursor as busy
                 System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
 
@@ -194,10 +197,12 @@ namespace PushUtransRoadsSGID
                 queryFilter.WhereClause = "DOT_F_MILE >= 0 or DOT_T_MILE >= 0";
                 IFeatureCursor arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
                 IFeature arcFeature;
+                int nulloutCount = 0;
 
                 streamWriter.WriteLine("Began nulling existing From/To values at: " + DateTime.Now.ToString());
                 while ((arcFeature = arcFeatureCursor.NextFeature()) != null)
                 {
+                    nulloutCount = nulloutCount + 1;
                     arcFeature.set_Value(arcFeature.Fields.FindField("DOT_F_MILE"), DBNull.Value);
                     arcFeature.set_Value(arcFeature.Fields.FindField("DOT_T_MILE"), DBNull.Value);
 
@@ -212,7 +217,7 @@ namespace PushUtransRoadsSGID
 
                 // Stop Edit Operation.
                 clsGlobals.arcEditor.StopOperation("Null MP Values");
-                streamWriter.WriteLine("Finished nulling existing From/To values at: " + DateTime.Now.ToString());
+                streamWriter.WriteLine("Finished nulling " + nulloutCount.ToString() + " existing From/To values at: " + DateTime.Now.ToString());
 
 
 
@@ -220,9 +225,25 @@ namespace PushUtransRoadsSGID
                 streamWriter.WriteLine("Began assigning mileposts at: " + DateTime.Now.ToString());
                 double searchOutDist = 15;
                 queryFilter = new QueryFilter();
-                // queryFilter.WhereClause = "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')"; // sde
-                queryFilter.WhereClause = "CHAR_LENGTH(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')";  // .gdb
-                //queryFilter.WhereClause = "(not DOT_RTNAME is null) and char_length (DOT_RTNAME)= 5"; // .shp
+
+                // check if sde, filegeodatabase, or shapefile - to determine what query syntax to use
+                IDataset datasetRoads = (IDataset)featureLayerRoads.FeatureClass;
+                if (datasetRoads.Workspace.Type == esriWorkspaceType.esriLocalDatabaseWorkspace)
+                {
+                    // file geodatabase
+                    queryFilter.WhereClause = "CHAR_LENGTH(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')";
+
+                }
+                else if (datasetRoads.Workspace.Type == esriWorkspaceType.esriRemoteDatabaseWorkspace)
+                {
+                    // sde geodatabase
+                    queryFilter.WhereClause = "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')";
+                }
+                else if (datasetRoads.Workspace.Type == esriWorkspaceType.esriFileSystemWorkspace)
+                {
+                    // shapefile
+                    queryFilter.WhereClause = "(not DOT_RTNAME is null) and char_length (DOT_RTNAME)= 5";
+                }
 
                 arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
                 IFeature arcFeature_Roads;
@@ -381,6 +402,7 @@ namespace PushUtransRoadsSGID
                     if (hitStart || hitEnd)
                     {
                         arcFeature_Roads.Store();
+                        assignedCounter = assignedCounter + 1;
                     }
 
                     // null out variables
@@ -394,7 +416,7 @@ namespace PushUtransRoadsSGID
 
                 // Done! //
                 streamWriter.WriteLine();
-                streamWriter.WriteLine("Done! Finished with zero errors.");
+                streamWriter.WriteLine("Done! Finished with zero errors.  This code assigned " + assignedCounter.ToString() + " road segments/features new mileposts.");
                 streamWriter.WriteLine("Finished at: " + DateTime.Now.ToString());
                 MessageBox.Show("Done assigning milepost values from SGID LRS Layer.  Don't forget to SAVE edits!  Go to the C:/temp folder to see the log file for this code run.", "Done!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
