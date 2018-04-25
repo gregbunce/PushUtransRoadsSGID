@@ -117,6 +117,9 @@ namespace PushUtransRoadsSGID
         {
             try
             {
+                // show the cursor as busy
+                System.Windows.Forms.Cursor.Current = Cursors.WaitCursor;
+
                 // create a text file for logging
                 // first check if c:\temp exists, if not create it.
                 bool tempDirExists = System.IO.Directory.Exists(@"C:\temp");
