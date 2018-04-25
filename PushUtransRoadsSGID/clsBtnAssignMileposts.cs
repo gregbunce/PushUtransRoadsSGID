@@ -245,6 +245,10 @@ namespace PushUtransRoadsSGID
                     queryFilter.WhereClause = "(not DOT_RTNAME is null) and char_length (DOT_RTNAME)= 5";
                 }
 
+                // log roads layer name and dataset type
+                streamWriter.WriteLine("Roads Layer Name: " + featureLayerRoads.Name.ToString());
+                streamWriter.WriteLine("Dataset/Workspace Type: " + datasetRoads.Workspace.Type.ToString());
+
                 arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
                 IFeature arcFeature_Roads;
                 bool hitStart = false;
