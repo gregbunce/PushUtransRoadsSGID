@@ -11,6 +11,7 @@ using ESRI.ArcGIS.Geometry;
 using ESRI.ArcGIS.esriSystem;
 using ESRI.ArcGIS.Editor;
 using ESRI.ArcGIS.Geodatabase;
+using System.IO;
 
 namespace PushUtransRoadsSGID
 {
@@ -72,6 +73,7 @@ namespace PushUtransRoadsSGID
         #endregion
         #endregion
 
+        StreamWriter streamWriter;
         private IApplication m_application;
         public clsBtnAssignMileposts()
         {
@@ -115,6 +117,19 @@ namespace PushUtransRoadsSGID
         {
             try
             {
+                // create a text file for logging
+                // first check if c:\temp exists, if not create it.
+                bool tempDirExists = System.IO.Directory.Exists(@"C:\temp");
+                if (!tempDirExists)
+                {
+                    System.IO.Directory.CreateDirectory(@"C:\temp");
+                }
+
+                string path = @"C:\temp\AssignMilepostsToRoads" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm") + ".txt";
+                System.IO.FileStream fileStream = new System.IO.FileStream(path, FileMode.Create);
+                streamWriter = new StreamWriter(fileStream);
+                streamWriter.WriteLine("Assign Mileposts to Road Centerlines began at: " + DateTime.Now.ToString());
+
                 clsGlobals.pMxDocument = (IMxDocument)clsGlobals.arcApplication.Document;
                 clsGlobals.pMap = clsGlobals.pMxDocument.FocusMap;
                 clsGlobals.pActiveView = clsGlobals.pMxDocument.ActiveView;
@@ -145,10 +160,10 @@ namespace PushUtransRoadsSGID
                     return;
                 }
 
-                //cast the selected layer as a feature layer
+                // cast the selected layer as a feature layer
                 clsGlobals.pGFlayer = (IGeoFeatureLayer)clsGlobals.pMxDocument.SelectedLayer;
 
-                //check if the feaure layer is a line layer
+                // check if the feaure layer is a line layer
                 if (clsGlobals.pGFlayer.FeatureClass.ShapeType != esriGeometryType.esriGeometryPolyline)
                 {
                     MessageBox.Show("Please select a  line layer (UTRANS Roads) in the TOC.", "Must be a Line Layer", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -177,6 +192,7 @@ namespace PushUtransRoadsSGID
                 IFeatureCursor arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
                 IFeature arcFeature;
 
+                streamWriter.WriteLine("Began nulling existing From/To values at: " + DateTime.Now.ToString());
                 while ((arcFeature = arcFeatureCursor.NextFeature()) != null)
                 {
                     arcFeature.set_Value(arcFeature.Fields.FindField("DOT_F_MILE"), DBNull.Value);
@@ -193,10 +209,12 @@ namespace PushUtransRoadsSGID
 
                 // Stop Edit Operation.
                 clsGlobals.arcEditor.StopOperation("Null MP Values");
+                streamWriter.WriteLine("Finished nulling existing From/To values at: " + DateTime.Now.ToString());
 
 
 
                 //// ASSIGN THE MILEPOST VALUES ////
+                streamWriter.WriteLine("Began assigning mileposts at: " + DateTime.Now.ToString());
                 double searchOutDist = 15;
                 queryFilter = new QueryFilter();
                 // queryFilter.WhereClause = "LEN(DOT_RTNAME) = 5 and (DOT_RTNAME like '0%')"; // sde
@@ -215,9 +233,9 @@ namespace PushUtransRoadsSGID
                 {
                     // get the route name from roads
                     var roadsRouteName = arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_RTNAME"));
-                    
-                    ////double roads_FromMile;
-                    ////double roads_ToMile;
+
+                    ////double roads_FromMile = 0;
+                    ////double roads_ToMile = 0;
 
                     ////// get the from mile value from roads
                     ////if (arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")) != DBNull.Value || arcFeature_Roads.get_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE")).ToString() != "")
@@ -254,16 +272,17 @@ namespace PushUtransRoadsSGID
                         IHitTest hitTest = (IHitTest)polyline_LRS;
 
                         // Hit test to see if a vertex is hit.
-                        hitStart = hitTest.HitTest(fromPoint_Roads,searchOutDist,esriGeometryHitPartType.esriGeometryPartVertex, point_Hit, dist, ref partIndex, ref segIndex, right);
+                        hitStart = hitTest.HitTest(fromPoint_Roads, searchOutDist, esriGeometryHitPartType.esriGeometryPartVertex, point_Hit, dist, ref partIndex, ref segIndex, right);
 
                         if (hitStart)
                         {
-                            if (fromPoint_Roads.M >= 0)
+                            if (point_Hit.M >= 0)
                             {
-                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((fromPoint_Roads.M * 1000) / 1000));
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((point_Hit.M * 1000) / 1000));
                             }
                             else
                             {
+                                streamWriter.WriteLine("Start/From M coordinate missing on ROUTE: " + roadsRouteName + " with OID:" + arcFeature_Roads.OID.ToString() + " pointHit_M Value: " + point_Hit.M.ToString());
                             }
                         }
                         else
@@ -289,6 +308,7 @@ namespace PushUtransRoadsSGID
                             }
                             else
                             {
+                                streamWriter.WriteLine("  end not found for OID: " + arcFeature_Roads.OID.ToString() + " RTNAME:" + roadsRouteName);
                             }
                         }
 
@@ -313,12 +333,13 @@ namespace PushUtransRoadsSGID
 
                         if (hitEnd)
                         {
-                            if (toPoint_Roads.M >= 0)
+                            if (point_Hit.M >= 0)
                             {
-                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((toPoint_Roads.M * 1000) / 1000));
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((point_Hit.M * 1000) / 1000));
                             }
                             else
                             {
+                                streamWriter.WriteLine("End/To M coordinate missing on ROUTE: " + roadsRouteName + " with OID:" + arcFeature_Roads.OID.ToString() + " pointHit_M Value: " + point_Hit.M.ToString());
                             }
                         }
                         else
@@ -344,8 +365,13 @@ namespace PushUtransRoadsSGID
                             }
                             else
                             {
+                                streamWriter.WriteLine("  end not found for OID: " + arcFeature_Roads.OID.ToString() + " RTNAME:" + roadsRouteName);
                             }
                         }
+                    }
+                    else
+                    {
+                        streamWriter.WriteLine("*** No LRS Route Found for OID:" + arcFeature_Roads.OID.ToString() + " RTNAME:" + roadsRouteName);
                     }
 
                     // store edit
@@ -364,14 +390,29 @@ namespace PushUtransRoadsSGID
                 clsGlobals.arcEditor.StopOperation("Assign MP Values");
 
                 // Done! //
-                MessageBox.Show("Done updating assigning milepost values from SGID LRS Layer.  Don't forget to SAVE edits!", "Done!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                streamWriter.WriteLine();
+                streamWriter.WriteLine("Done! Finished with zero errors.");
+                streamWriter.WriteLine("Finished at: " + DateTime.Now.ToString());
+                MessageBox.Show("Done assigning milepost values from SGID LRS Layer.  Don't forget to SAVE edits!  Go to the C:/temp folder to see the log file for this code run.", "Done!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             catch (Exception ex)
             {
+                streamWriter.WriteLine();
+                streamWriter.WriteLine("Errored-out at: " + DateTime.Now.ToString());
+                streamWriter.WriteLine("The code below this line is from the try-catch error message.");
+                streamWriter.WriteLine("Error Message: " + Environment.NewLine + ex.Message + Environment.NewLine + Environment.NewLine +
+                "Error Source: " + Environment.NewLine + ex.Source + Environment.NewLine + Environment.NewLine +
+                "Error Location:" + Environment.NewLine + ex.StackTrace);
+
                 MessageBox.Show("Error Message: " + Environment.NewLine + ex.Message + Environment.NewLine + Environment.NewLine +
                 "Error Source: " + Environment.NewLine + ex.Source + Environment.NewLine + Environment.NewLine +
                 "Error Location:" + Environment.NewLine + ex.StackTrace,
                 "clsBtnAssignMilepost: ", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            finally
+            {
+                //close the stream writer
+                streamWriter.Close();
             }
         }
 
