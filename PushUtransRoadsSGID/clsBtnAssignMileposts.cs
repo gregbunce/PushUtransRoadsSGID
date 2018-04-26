@@ -195,7 +195,8 @@ namespace PushUtransRoadsSGID
                 // Null out the existing DOT_F_MILE and DOT_T_MILE values
                 IQueryFilter queryFilter = new QueryFilter();
                 queryFilter.WhereClause = "DOT_F_MILE >= 0 or DOT_T_MILE >= 0";
-                IFeatureCursor arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
+                // IFeatureCursor arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);  // use this if you don't want to honor definition query on layer
+                IFeatureCursor arcFeatureCursor = clsGlobals.pGFlayer.Search(queryFilter, false); // use this if you want to honor definition query on layer
                 IFeature arcFeature;
                 int nulloutCount = 0;
 
@@ -249,7 +250,8 @@ namespace PushUtransRoadsSGID
                 streamWriter.WriteLine("Roads Layer Name: " + featureLayerRoads.Name.ToString());
                 streamWriter.WriteLine("Dataset/Workspace Type: " + datasetRoads.Workspace.Type.ToString());
 
-                arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false);
+                //arcFeatureCursor = featureLayerRoads.FeatureClass.Search(queryFilter, false); // use this if you don't want to honor definition query on layer
+                arcFeatureCursor = clsGlobals.pGFlayer.Search(queryFilter, false); // use this if you want to honor definition query on layer
                 IFeature arcFeature_Roads;
                 bool hitStart = false;
                 bool hitEnd = false;
