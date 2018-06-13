@@ -82,7 +82,7 @@ namespace PushUtransRoadsSGID
             //
             base.m_category = "AGRC"; //localizable text
             base.m_caption = "Assign Mileposts";  //localizable text
-            base.m_message = "Make sure the selected layer in the TOC is the desired Roads layer to be edited and that the SGID LRS Layer is the top-most layer. This tool will null out existing From/To mileposts and then reassign those values based on the SGID LRS.";  //localizable text 
+            base.m_message = "Make sure the selected layer in the TOC is the desired Roads layer to be edited and that the LRS Layer is the top-most layer. This tool will null out existing From/To mileposts and then reassign those values based on the SGID LRS.  It also honors definition queries.";  //localizable text 
             base.m_toolTip = "Assign Mileposts";  //localizable text 
             base.m_name = "AssignMilepost";   //unique id, non-localizable (e.g. "MyCategory_ArcMapCommand")
             base.m_bitmap = Properties.Resources.AnimationMoveLayerAlongPath16;
@@ -183,9 +183,14 @@ namespace PushUtransRoadsSGID
                 IFeatureLayer featureLayerLRS = (IFeatureLayer)clsGlobals.pMap.Layer[0];
 
                 // Make sure the alias name for the LRS layer is as such...
-                if (featureLayerLRS.FeatureClass.AliasName != "SGID10.TRANSPORTATION.UDOTRoutes_LRS")
+                //if (featureLayerLRS.FeatureClass.AliasName != "SGID10.TRANSPORTATION.UDOTRoutes_LRS")
+                //{
+                //    MessageBox.Show("Make sure the top most layer in the TOC is pointed to SGID10.TRANSPORTATION.UDOTRoutes_LRS", "LRS Layer Missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //    return;
+                //}
+                if (!(featureLayerLRS.FeatureClass.AliasName.ToString().Contains("LRS")))
                 {
-                    MessageBox.Show("Make sure the top most layer in the TOC is pointed to SGID10.TRANSPORTATION.UDOTRoutes_LRS", "LRS Layer Missing", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Make sure the top most layer in the TOC is the UDOTRoutes_LRS layer and that it's alias name contains LRS", "Missing LRS Layer Name", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
@@ -308,7 +313,10 @@ namespace PushUtransRoadsSGID
                         {
                             if (point_Hit.M >= 0)
                             {
-                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((point_Hit.M * 1000) / 1000));
+                                // round to 3 decimals for David Buell's Spillman stuff
+                                double dot_f_mile_double = Convert.ToDouble((point_Hit.M * 1000) / 1000);
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Math.Round(dot_f_mile_double,3));
+                                //arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((point_Hit.M * 1000) / 1000));
                             }
                             else
                             {
@@ -334,7 +342,10 @@ namespace PushUtransRoadsSGID
                                 // interpolate
                                 segment.QueryPointAndDistance(esriSegmentExtension.esriNoExtension, fromPoint_Roads, true, outPoint, outDist, awayDist, true);
                                 mcoord = segment.FromPoint.M + ((segment.ToPoint.M - segment.FromPoint.M) * outDist);
-                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((mcoord * 1000) / 1000) + 0.001);
+                                // round to 3 decimals for David Buell's Spillman stuff
+                                double dot_f_mile_double = Convert.ToDouble((mcoord * 1000) / 1000) + 0.001;
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Math.Round(dot_f_mile_double,3));
+                                // arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_F_MILE"), Convert.ToDouble((mcoord * 1000) / 1000) + 0.001);
                             }
                             else
                             {
@@ -365,7 +376,10 @@ namespace PushUtransRoadsSGID
                         {
                             if (point_Hit.M >= 0)
                             {
-                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((point_Hit.M * 1000) / 1000));
+                                // round to 3 decimals for David Buell's Spillman stuff
+                                double dot_t_mile_double = Convert.ToDouble((point_Hit.M * 1000) / 1000);
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Math.Round(dot_t_mile_double, 3));
+                                //arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((point_Hit.M * 1000) / 1000));
                             }
                             else
                             {
@@ -391,7 +405,10 @@ namespace PushUtransRoadsSGID
                                 // interpolate
                                 segment.QueryPointAndDistance(esriSegmentExtension.esriNoExtension, toPoint_Roads, true, outPoint, outDist, awayDist, true);
                                 mcoord = segment.FromPoint.M + ((segment.ToPoint.M - segment.FromPoint.M) * outDist);
-                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((mcoord * 1000) / 1000));
+                                // round to 3 decimals for David Buell's Spillman stuff
+                                double dot_t_mile_double = Convert.ToDouble((mcoord * 1000) / 1000);
+                                arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Math.Round(dot_t_mile_double, 3));
+                                //arcFeature_Roads.set_Value(arcFeature_Roads.Fields.FindField("DOT_T_MILE"), Convert.ToDouble((mcoord * 1000) / 1000));
                             }
                             else
                             {
@@ -413,7 +430,8 @@ namespace PushUtransRoadsSGID
 
                     // null out variables
                     queryFilter_LRS = null;
-                    arcFeatureCursor_LRS = null;
+                    //arcFeatureCursor_LRS = null;
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(arcFeatureCursor_LRS);
                     arcFeature_Roads = null;
                 }
 
