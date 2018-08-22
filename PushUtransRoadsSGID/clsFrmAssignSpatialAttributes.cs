@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
 
 namespace PushUtransRoadsSGID
 {
@@ -464,7 +465,7 @@ namespace PushUtransRoadsSGID
                             {
                                 string strCityRight = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("NAME")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCityRight.Text), strCityRight.ToUpper());
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCityRight.Text), strCityRight);
                             }
                         }
 
@@ -478,7 +479,7 @@ namespace PushUtransRoadsSGID
                             {
                                 string strCityLeft = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("NAME")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCityLeft.Text), strCityLeft.ToUpper());
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboCityLeft.Text), strCityLeft);
                             }
                         }
 
@@ -491,9 +492,10 @@ namespace PushUtransRoadsSGID
                             if (arcFeatureIntersected != null)
                             {
                                 string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                string strGridName_TitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(strGridName.ToLower());
                                 string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysLeft.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysLeft.Text), strGridName_TitleCase);
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadLeft.Text), strQuad);
                             }
                         }
@@ -505,9 +507,10 @@ namespace PushUtransRoadsSGID
                             if (arcFeatureIntersected != null)
                             {
                                 string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                string strGridName_TitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(strGridName.ToLower());
                                 //string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysLeft.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysLeft.Text), strGridName_TitleCase);
                                 //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadLeft.Text), strQuad);
                             }
                         }
@@ -535,9 +538,10 @@ namespace PushUtransRoadsSGID
                             if (arcFeatureIntersected != null)
                             {
                                 string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                string strGridName_TitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(strGridName.ToLower());
                                 string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysRight.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysRight.Text), strGridName_TitleCase);
                                 clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadRight.Text), strQuad);
                             }
                         }
@@ -549,9 +553,10 @@ namespace PushUtransRoadsSGID
                             if (arcFeatureIntersected != null)
                             {
                                 string strGridName = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("GRID_NAME")).ToString().Trim();
+                                string strGridName_TitleCase = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(strGridName.ToLower());
                                 //string strQuad = arcFeatureIntersected.get_Value(arcFeatureIntersected.Fields.FindField("QUADRANT")).ToString().Trim();
 
-                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysRight.Text), strGridName);
+                                clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddrSysRight.Text), strGridName_TitleCase);
                                 //clsGlobals.arcFeatureToEditSpatial.set_Value(clsGlobals.arcFeatureToEditSpatial.Fields.FindField(cboAddressQuadRight.Text), strQuad);
                             }
                         }
