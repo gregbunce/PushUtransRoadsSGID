@@ -212,7 +212,7 @@ namespace PushUtransRoadsSGID
                 }
 
                 // connect to sgid database
-                clsGlobals.workspaceSGID = clsPushSgidStaticClass.ConnectToTransactionalVersion("", "sde:sqlserver:sgid.agrc.utah.gov", "SGID10", "DBMS", "sde.DEFAULT", "agrc", "agrc");
+                clsGlobals.workspaceSGID = clsPushSgidStaticClass.ConnectToTransactionalVersion("", "sde:sqlserver:internal.agrc.utah.gov", "SGID", "DBMS", "sde.DEFAULT", "internal", "internal");
                 clsGlobals.featureWorkspaceSGID = (IFeatureWorkspace)clsGlobals.workspaceSGID;
 
                 // get access to sgid feature classes for spatial intersects

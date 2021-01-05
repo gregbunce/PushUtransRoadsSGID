@@ -91,11 +91,11 @@ namespace PushUtransRoadsSGID
             try
             {
                 // get access to the sgid feature classes
-                clsGlobals.arcFeatClass_Counties = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.BOUNDARIES.Counties");
-                clsGlobals.arcFeatClass_Muni = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.BOUNDARIES.Municipalities");
-                clsGlobals.arcFeatClass_ZipCodes = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.BOUNDARIES.ZipCodes");
-                clsGlobals.arcFeatClass_AddrSys = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.LOCATION.AddressSystemQuadrants");
-                clsGlobals.arcFeatClass_USNG = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID10.INDICES.NationalGrid");
+                clsGlobals.arcFeatClass_Counties = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID.BOUNDARIES.Counties");
+                clsGlobals.arcFeatClass_Muni = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID.BOUNDARIES.Municipalities");
+                clsGlobals.arcFeatClass_ZipCodes = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID.BOUNDARIES.ZipCodes");
+                clsGlobals.arcFeatClass_AddrSys = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID.LOCATION.AddressSystemQuadrants");
+                clsGlobals.arcFeatClass_USNG = clsGlobals.featureWorkspaceSGID.OpenFeatureClass("SGID.INDICES.NationalGrid");
             }
             catch (Exception ex)
             {
