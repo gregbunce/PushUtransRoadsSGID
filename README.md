@@ -6,3 +6,4 @@ The tools in this repo are designed for ArcMap 10.7.x and built with the ArcObje
 
 This project also requires the .NET setup project (VS Installer package) to create the installation files (.msi). 
 https://learn.microsoft.com/en-us/visualstudio/deployment/installer-projects-net-core?view=vs-2022
+https://drive.google.com/drive/folders/1G2Dx56jpmBKF0xAL-6GO2QLfl1IXd7eP?usp=sharing
